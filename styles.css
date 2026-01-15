@@ -1,7 +1,7 @@
 ﻿/* Container Principal */
 #ai-queue-panel {
   position: fixed;
-  top: 20px;
+  top: 80px; /* Descendo para não tampar botões do GPT */
   right: 20px;
   width: 320px;
   background-color: #1e1e1e;
@@ -14,24 +14,36 @@
   box-shadow: 0 12px 40px rgba(0,0,0,0.7);
   display: flex;
   flex-direction: column;
-  max-height: 85vh;
-  transition: width 0.3s, height 0.3s;
+  max-height: 80vh;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.95;
+}
+
+#ai-queue-panel:hover {
+  opacity: 1;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.9);
 }
 
 #ai-queue-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 12px 16px;
   background: #252526;
   border-bottom: 1px solid #333;
   border-radius: 12px 12px 0 0;
+  cursor: grab;
+}
+
+#ai-queue-header:active {
+  cursor: grabbing;
 }
 
 #ai-queue-header span {
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: #00a2ff;
 }
 
@@ -70,6 +82,7 @@ textarea#ai-queue-input {
 
 input.qm-input {
   height: 38px;
+  margin-bottom: 4px;
 }
 
 .queue-controls {
@@ -93,16 +106,16 @@ button.queue-btn {
 }
 
 button svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   fill: currentColor;
 }
 
-#btn-load { background-color: #3a3a3a; color: #fff; }
-#btn-load:hover { background-color: #4a4a4a; }
+#btn-load { background-color: #333; color: #eee; border: 1px solid #444; }
+#btn-load:hover { background-color: #444; }
 
-#btn-clear { background-color: #3d2525; color: #ff8080; }
-#btn-clear:hover { background-color: #4d2d2d; }
+#btn-clear { background-color: #2d1a1a; color: #ff8080; border: 1px solid #452525; }
+#btn-clear:hover { background-color: #3d2020; }
 
 #btn-next {
   background-color: #007acc;
@@ -110,22 +123,25 @@ button svg {
   padding: 12px;
 }
 #btn-next:hover { background-color: #0098ff; }
-#btn-next:disabled { background-color: #2d2d2d; color: #555; cursor: not-allowed; }
+#btn-next:disabled { background-color: #252526; color: #555; cursor: not-allowed; border: 1px solid #333; }
 
 #btn-download-log {
-  background-color: #1a4a1a;
+  background-color: #1a3a1a;
   color: #80ff80;
+  border: 1px solid #254525;
 }
-#btn-download-log:hover { background-color: #2a5a2a; }
+#btn-download-log:hover { background-color: #254a25; }
 
 .status-bar {
-  font-size: 11px;
+  font-size: 10px;
   color: #888;
   background: #111;
   padding: 8px;
   border-radius: 6px;
   text-align: center;
   border: 1px solid #222;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Lista de Fila */
@@ -144,7 +160,6 @@ button svg {
   justify-content: space-between;
   align-items: center;
   border: 1px solid #333;
-  transition: all 0.2s;
 }
 
 .queue-item.active {
@@ -153,8 +168,8 @@ button svg {
 }
 
 .queue-item.done {
-  opacity: 0.5;
-  background: #1a1a1a;
+  opacity: 0.4;
+  background: #161616;
 }
 
 .btn-item-del {
@@ -180,16 +195,38 @@ button svg {
   gap: 10px;
   font-size: 11px;
   color: #888;
-  margin: 4px 0;
-}
-
-input[type="checkbox"] {
-  accent-color: #007acc;
+  margin: 2px 0;
 }
 
 /* Minimize Logic */
 #ai-queue-panel.minimized {
-  width: 180px;
+  width: 48px;
   height: 48px;
+  top: 80px;
+  right: 20px;
+  border-radius: 50%;
   overflow: hidden;
+}
+
+#ai-queue-panel.minimized #panel-content {
+  display: none !important;
+}
+
+#ai-queue-panel.minimized #ai-queue-header {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  background: #007acc;
+  border: none;
+}
+
+#ai-queue-panel.minimized #ai-queue-header span {
+  display: none;
+}
+
+#ai-queue-panel.minimized #btn-minimize {
+  color: white;
+  width: 100%;
+  height: 100%;
 }
