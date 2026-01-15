@@ -25,7 +25,6 @@
   background: #252526;
   border-bottom: 1px solid #333;
   border-radius: 12px 12px 0 0;
-  cursor: move;
 }
 
 #ai-queue-header span {
@@ -88,7 +87,6 @@ button.queue-btn {
   font-size: 13px;
 }
 #btn-next:hover { background-color: #0098ff; }
-#btn-next:disabled { background-color: #333; color: #666; cursor: not-allowed; }
 
 .status-bar {
   font-size: 11px;
@@ -99,7 +97,6 @@ button.queue-btn {
   text-align: center;
 }
 
-/* Lista de Fila */
 #queue-list {
   display: flex;
   flex-direction: column;
@@ -115,38 +112,13 @@ button.queue-btn {
   justify-content: space-between;
   align-items: center;
   border-left: 4px solid #444;
-  transition: transform 0.1s;
 }
 
-.queue-item span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-.queue-item.active {
-  border-left-color: #007acc;
-  background: #263545;
-}
-
-.queue-item.done {
-  border-left-color: #107c10;
-  opacity: 0.6;
-}
+.queue-item.active { border-left-color: #007acc; background: #263545; }
+.queue-item.done { border-left-color: #107c10; opacity: 0.6; }
 
 .btn-item-del {
-  background: none;
-  border: none;
-  color: #ff5555;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 0 5px;
-  border-radius: 4px;
-}
-
-.btn-item-del:hover {
-  background: rgba(255,0,0,0.2);
+  background: none; border: none; color: #ff5555; cursor: pointer; font-size: 14px;
 }
 
 .auto-advance-row {
@@ -155,10 +127,33 @@ button.queue-btn {
   gap: 8px;
   font-size: 11px;
   color: #ccc;
-  margin-top: 5px;
+}
+
+/* Novo Rodapé */
+#ai-queue-footer {
+  padding: 10px 15px;
+  background: #252526;
+  border-top: 1px solid #333;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: #888;
+}
+
+#ai-queue-footer a {
+  color: #ffdd00;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#ai-queue-footer a:hover {
+  text-decoration: underline;
 }
 
 #ai-queue-panel.minimized {
   width: 150px;
   height: 40px;
+  overflow: hidden;
 }
