@@ -3,8 +3,7 @@ let promptQueue = [];
 let currentIndex = 0;
 let isPanelMinimized = false;
 let autoAdvance = false;
-let serverOnline = false;
-let isProcessing = false; // ADDED: Lock flag
+let isProcessing = false;
 
 // 1. Criar e Injetar a Interface (UI)
 function createInterface() {
@@ -14,9 +13,8 @@ function createInterface() {
   panel.id = 'ai-queue-panel';
   panel.innerHTML = `
     <div id="ai-queue-header">
-      <span>Queue Master PRO 🚀</span>
+      <span>Queue Master LITE 🚀</span>
       <div style="display:flex; gap:10px; align-items:center;">
-        <div id="server-indicator" title="Servidor Offline" style="width:8px; height:8px; border-radius:50%; background:#555;"></div>
         <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
       </div>
     </div>
@@ -30,7 +28,7 @@ function createInterface() {
 
       <div class="auto-advance-row">
         <input type="checkbox" id="chk-auto-advance">
-        <label for="chk-auto-advance">Auto-avançar & Salvar</label>
+        <label for="chk-auto-advance">Auto-avançar & Salvar (Downloads)</label>
       </div>
 
       <div id="queue-status" class="status-bar">Fila vazia</div>
@@ -53,8 +51,6 @@ function createInterface() {
   document.getElementById('chk-auto-advance').addEventListener('change', (e) => {
     autoAdvance = e.target.checked;
   });
-
-  checkServerConnection();
 }
 
 // 2. Funções da Interface
@@ -84,8 +80,6 @@ function loadQueue() {
 
   updateStatus();
   renderQueueList();
-
-  // Re-enable if we added items
   updateNextButtonText();
 }
 
@@ -106,7 +100,7 @@ function clearQueue() {
     renderQueueList();
     updateStatus();
     document.getElementById('btn-next').disabled = true;
-    isProcessing = false; // Reset lock
+    isProcessing = false;
   }
 }
 
@@ -123,7 +117,6 @@ function updateNextButtonText() {
   const btn = document.getElementById('btn-next');
   if (currentIndex < promptQueue.length) {
     btn.textContent = `▶ Enviar Prompt ${currentIndex + 1}`;
-    // Only enable if NOT processing
     btn.disabled = isProcessing;
   } else {
     btn.textContent = "✅ Fila Finalizada";
@@ -195,10 +188,7 @@ function isGenerating() {
 
 function sendNextPrompt(manualClick = false) {
   if (currentIndex >= promptQueue.length) return;
-  if (isProcessing) {
-      console.log("Already processing, ignoring request.");
-      return; 
-  }
+  if (isProcessing) return; 
 
   const inputEl = getChatInput();
   if (!inputEl) {
@@ -206,8 +196,8 @@ function sendNextPrompt(manualClick = false) {
     return;
   }
 
-  isProcessing = true; // LOCK
-  updateNextButtonText(); // Disable button
+  isProcessing = true;
+  updateNextButtonText();
 
   const promptText = promptQueue[currentIndex];
   inputEl.focus();
@@ -244,26 +234,24 @@ function updateStatusDisplay(msg) {
   document.getElementById('queue-status').textContent = msg;
 }
 
-// 4. Integração com Servidor (Capture & Save)
-async function checkServerConnection() {
-  try {
-    const res = await fetch('http://localhost:5000/health');
-    if (res.ok) {
-      serverOnline = true;
-      const indicator = document.getElementById('server-indicator');
-      if (indicator) {
-        indicator.style.background = '#00ff00';
-        indicator.title = "Servidor Conectado - Salvamento Automático Ativo";
-      }
-    }
-  } catch (e) {
-    serverOnline = false;
-    const indicator = document.getElementById('server-indicator');
-    if (indicator) {
-      indicator.style.background = '#555';
-      indicator.title = "Servidor Offline - Inicie o server.py para salvar arquivos";
-    }
-  }
+// 4. Salvamento Nativo (Substituindo Python)
+function downloadResponse(prompt, content) {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `response-${currentIndex + 1}-${timestamp}.md`;
+  const fileContent = `# Prompt:\n${prompt}\n\n# Resposta:\n${content}`;
+  
+  const blob = new Blob([fileContent], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  updateStatusDisplay(`📂 Salvo em Downloads`);
 }
 
 function captureLastResponse() {
@@ -273,24 +261,6 @@ function captureLastResponse() {
     return lastResponse.innerText;
   }
   return null;
-}
-
-async function saveResponseToServer(prompt, content) {
-  if (!serverOnline) return;
-
-  try {
-    const res = await fetch('http://localhost:5000/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, content })
-    });
-    const data = await res.json();
-    console.log("Salvo:", data);
-    updateStatusDisplay(`💾 Salvo: ${data.file}`);
-  } catch (e) {
-    console.error("Erro ao salvar:", e);
-    updateStatusDisplay("❌ Erro ao salvar");
-  }
 }
 
 function monitorResponse() {
@@ -303,22 +273,17 @@ function monitorResponse() {
     }
 
     if (!isGenerating()) {
-      // Potentially done. Stop checking immediately to prevent race conditions.
       clearInterval(window.monitorInterval);
 
-      setTimeout(async () => {
-        // Double check after delay
+      setTimeout(() => {
         if (!isGenerating() && !checkAutoContinue()) {
-          // CONFIRMED FINISHED
-          
           const responseText = captureLastResponse();
-          if (responseText && serverOnline) {
-            updateStatusDisplay("💾 Salvando...");
-            await saveResponseToServer(promptQueue[currentIndex], responseText);
+          if (responseText && autoAdvance) {
+            downloadResponse(promptQueue[currentIndex], responseText);
           }
 
           currentIndex++;
-          isProcessing = false; // UNLOCK
+          isProcessing = false;
           
           updateStatus();
           renderQueueList();
@@ -328,14 +293,13 @@ function monitorResponse() {
             updateStatusDisplay("🚀 Próximo em 3s...");
             setTimeout(() => sendNextPrompt(), 3000);
           } else if (!autoAdvance) {
-             updateStatusDisplay("✅ Concluído (Aguardando)");
+             updateStatusDisplay("✅ Concluído");
           } else {
              updateStatusDisplay("🎉 Fila Finalizada");
           }
         } else {
-          // False alarm
-          updateStatusDisplay("⏳ Processando (retomada)...");
-          monitorResponse(); // Restart monitoring
+          updateStatusDisplay("⏳ Processando...");
+          monitorResponse();
         }
       }, 2000);
     }
@@ -344,4 +308,3 @@ function monitorResponse() {
 
 createInterface();
 setInterval(createInterface, 3000);
-setInterval(checkServerConnection, 5000);
