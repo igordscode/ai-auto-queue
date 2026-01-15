@@ -1,15 +1,15 @@
 ﻿# Backlog de Desenvolvimento
 
-## Alta Prioridade
-- [ ] **Tratamento de Erros de Rede:** Detectar se o chat caiu ("Network Error") e pausar a fila com um alerta sonoro.
-- [ ] **Customização de Delay:** Permitir que o usuário configure o tempo de espera entre prompts (hoje fixo em 3s).
-- [ ] **Seleção de Elementos Dinâmica:** Criar uma interface para o usuário "apontar" onde é a caixa de texto caso o layout do site mude.
+## Melhorias Técnicas
+- [ ] **Tratamento de Erro de Rede:** Pausar a fila e alertar se a internet cair ou o chat der erro 500.
+- [ ] **Persistência de Fila:** Salvar a fila no LocalStorage para não perder os prompts se fechar a aba sem querer.
+- [ ] **Delay Customizável:** Input para o usuário definir quantos segundos esperar entre prompts.
 
-## Melhorias de UI/UX
-- [ ] Dark Mode nativo para o painel.
-- [ ] Barra de progresso visual (%).
-- [ ] Histórico de filas executadas (Logs).
+## Novas Features
+- [ ] **Importar Arquivo:** Botão para carregar prompts direto de um arquivo .txt ou .csv.
+- [ ] **Retry Automático:** Tentar reenviar o prompt se der erro de "Something went wrong".
+- [ ] **Modo "Loop":** Repetir a mesma fila X vezes.
 
-## Integrações
-- [ ] Webhook genérico: Enviar o texto da resposta para um URL (Zapier/n8n).
-- [ ] Suporte oficial ao Claude.ai (testar seletores).
+## UI/UX
+- [ ] **Temas:** Permitir que o usuário escolha cores do painel.
+- [ ] **Barra de Progresso:** Visualização gráfica da porcentagem concluída.
