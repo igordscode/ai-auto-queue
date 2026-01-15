@@ -1,7 +1,7 @@
-﻿# 🚀 Queue Master PRO
+﻿# 🚀 AI Prompt Queue Master
 ### The Ultimate AI Automation & Bulk Prompting Suite
 
-**Queue Master PRO** turns your favorite AI chat interface (ChatGPT, Gemini, etc.) into a powerful production line. Load hundreds of prompts, sit back, and watch it work.
+**AI Prompt Queue Master** turns your favorite AI chat interface (ChatGPT, Gemini, etc.) into a powerful production line. Load hundreds of prompts, sit back, and watch it work.
 
 ![Version](https://img.shields.io/badge/version-2.1-blue) ![Languages](https://img.shields.io/badge/languages-6-green) ![License](https://img.shields.io/badge/license-MIT-orange)
 
@@ -85,3 +85,4 @@ If this tool saved you time, consider checking out my other projects or starring
 
 ## 📜 License
 This project is licensed under the [MIT License](LICENSE) - feel free to use, modify, and distribute.
+

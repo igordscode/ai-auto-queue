@@ -1,8 +1,9 @@
 ﻿{
   "manifest_version": 3,
-  "name": "Queue Master PRO",
-  "version": "2.0",
-  "description": "The Ultimate AI Automation & Bulk Prompting Suite. Auto-advance, auto-save, and queue management.",
+  "name": "AI Prompt Queue Master",
+  "short_name": "AI Queue",
+  "version": "2.2",
+  "description": "Bulk prompt automation for ChatGPT & Gemini. Auto-advance queue, auto-save history (.md), and smart workflow management.",
   "permissions": [
     "activeTab",
     "scripting"

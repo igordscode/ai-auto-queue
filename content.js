@@ -9,7 +9,7 @@ let sessionLog = "";
 // Sistema de Tradução
 const TRANSLATIONS = {
     'pt': {
-        title: "QUEUE MASTER PRO",
+        title: "AI PROMPT QUEUE",
         placeholder: "Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)",
         filenamePlaceholder: "Nome do arquivo (ex: Meu_Livro)",
         load: "Carregar",
@@ -32,7 +32,7 @@ const TRANSLATIONS = {
         itemRegistered: "📝 Item"
     },
     'en': {
-        title: "QUEUE MASTER PRO",
+        title: "AI PROMPT QUEUE",
         placeholder: "Paste your prompts here... (Separate blocks with empty lines)",
         filenamePlaceholder: "Filename (e.g., My_Book)",
         load: "Load",
@@ -55,7 +55,7 @@ const TRANSLATIONS = {
         itemRegistered: "📝 Item"
     },
     'es': {
-        title: "QUEUE MASTER PRO",
+        title: "AI PROMPT QUEUE",
         placeholder: "Pega tus prompts aquí... (Separa bloques con líneas vacías)",
         filenamePlaceholder: "Nombre del archivo (ej: Mi_Libro)",
         load: "Cargar",
@@ -78,7 +78,7 @@ const TRANSLATIONS = {
         itemRegistered: "📝 Ítem"
     },
     'fr': {
-        title: "QUEUE MASTER PRO",
+        title: "AI PROMPT QUEUE",
         placeholder: "Collez vos prompts ici... (Séparez les blocs par des lignes vides)",
         filenamePlaceholder: "Nom du fichier (ex: Mon_Livre)",
         load: "Charger",
@@ -101,7 +101,7 @@ const TRANSLATIONS = {
         itemRegistered: "📝 Item"
     },
     'de': {
-        title: "QUEUE MASTER PRO",
+        title: "AI PROMPT QUEUE",
         placeholder: "Fügen Sie Ihre Prompts hier ein... (Blöcke durch Leerzeilen trennen)",
         filenamePlaceholder: "Dateiname (z.B. Mein_Buch)",
         load: "Laden",
@@ -124,7 +124,7 @@ const TRANSLATIONS = {
         itemRegistered: "📝 Element"
     },
     'zh': {
-        title: "QUEUE MASTER PRO",
+        title: "AI PROMPT QUEUE",
         placeholder: "在此粘贴您的提示...（用空行分隔块）",
         filenamePlaceholder: "文件名（例如：我的书）",
         load: "加载",
@@ -405,4 +405,5 @@ function monitorResponse() {
 
 createInterface();
 setInterval(createInterface, 3000);
+
 
