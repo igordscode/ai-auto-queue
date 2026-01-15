@@ -32,9 +32,13 @@ function createInterface() {
       
       <button id="btn-next" class="queue-btn" disabled>▶ Enviar Próximo</button>
       
-      <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+      <div id="queue-list-container" style="max-height: 180px; overflow-y: auto; margin-top: 10px;">
         <div id="queue-list"></div>
       </div>
+    </div>
+    <div id="ai-queue-footer">
+      <span>By <b>igordscode</b></span>
+      <a href="https://www.buymeacoffee.com/igordscode" target="_blank">☕ Buy me a coffee</a>
     </div>
   `;
 
@@ -44,7 +48,7 @@ function createInterface() {
   document.getElementById('btn-minimize').addEventListener('click', toggleMinimize);
   document.getElementById('btn-load').addEventListener('click', loadQueue);
   document.getElementById('btn-clear').addEventListener('click', clearQueue);
-  document.getElementById('btn-next').addEventListener('click', () => sendNextPrompt(true));
+  document.getElementById('btn-next').addEventListener('click', () => sendNextPrompt(manualClick = true));
   document.getElementById('chk-auto-advance').addEventListener('change', (e) => {
     autoAdvance = e.target.checked;
   });
@@ -54,6 +58,7 @@ function createInterface() {
 function toggleMinimize() {
   const panel = document.getElementById('ai-queue-panel');
   const content = document.getElementById('panel-content');
+  const footer = document.getElementById('ai-queue-footer');
   const btn = document.getElementById('btn-minimize');
   isPanelMinimized = !isPanelMinimized;
   
@@ -61,10 +66,12 @@ function toggleMinimize() {
     panel.classList.add('minimized');
     btn.textContent = '▢';
     content.style.display = 'none';
+    footer.style.display = 'none';
   } else {
     panel.classList.remove('minimized');
     btn.textContent = '_';
     content.style.display = 'flex';
+    footer.style.display = 'flex';
   }
 }
 
