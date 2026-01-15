@@ -1,8 +1,8 @@
-﻿{
+{
   "manifest_version": 3,
-  "name": "Queue Master PRO",
-  "version": "2.0",
-  "description": "The Ultimate AI Automation & Bulk Prompting Suite. Auto-advance, auto-save, and queue management.",
+  "name": "Prompt Queue Master",
+  "version": "1.0",
+  "description": "Automate sending sequential prompts to AI chats.",
   "permissions": [
     "activeTab",
     "scripting"

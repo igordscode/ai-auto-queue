@@ -1,30 +1,27 @@
-# Roadmap - AI Queue Master
+﻿# Roadmap - Queue Master PRO
 
 ## Fase 1: MVP (Concluído ✅)
 - [x] Estrutura básica da extensão (Manifest v3).
-- [x] Injeção de painel flutuante na página.
-- [x] Fila simples de texto.
-- [x] Envio básico de prompts.
+- [x] Painel flutuante injetado.
+- [x] Fila sequencial simples.
 
-## Fase 2: Robustez (Concluído ✅)
-- [x] **Auto-Continue:** Detectar e clicar no botão de continuar automaticamente.
-- [x] Monitoramento de estado da IA (Gerando/Parado).
-- [x] Reconexão automática da interface (SPA navigation support).
+## Fase 2: Estabilidade & UX (Concluído ✅)
+- [x] **Auto-Continue:** Clicar em "Continuar gerando" automaticamente.
+- [x] **Bulk Import:** Colar lista de prompts.
+- [x] **Smart Monitoring:** Correção de bugs de pular itens (Fix v2.0).
+- [x] **UI Polish:** Botões de minimizar, limpar e status visual.
 
-## Fase 3: User Experience (Concluído ✅)
-- [x] Painel Minimzável.
-- [x] Excluir itens individuais da fila.
-- [x] Bulk Import (Colar lista com quebra de linha inteligente).
-- [x] **Auto-Advance:** Checkbox para enviar o próximo prompt automaticamente.
+## Fase 3: Integração de Sistema (Concluído ✅)
+- [x] Servidor Python Local (Flask).
+- [x] Auto-Save de respostas em arquivos locais.
+- [x] Documentação Comercial (README v2.0).
 
-## Fase 4: Integração com Sistema (Em Progresso 🚧)
-- [x] Criar servidor Python local (Flask).
-- [x] Comunicação HTTP (Extensão -> Python).
-- [x] Salvamento automático de respostas em Markdown (`.md`).
-- [ ] Integração com n8n/Webhook (Enviar JSON para automação externa).
+## Fase 4: Advanced AI Orchestration (Próximo 🚀)
+- [ ] **Dynamic Branching:** O servidor lê a resposta da IA e decide qual o próximo prompt (usando uma API leve local ou remota).
+- [ ] **Retry Logic:** Se a IA der erro de rede, tentar recarregar a página e reenviar o último prompt.
+- [ ] **Multi-Tab Support:** Rodar filas diferentes em abas diferentes simultaneamente.
+- [ ] **Export to Notion/Google Docs:** Integração direta via API em vez de apenas arquivos locais.
 
-## Fase 5: Modo Agente / AI Orchestrator (Novo 🔮)
-*Transformar a extensão em um Agente Autônomo.*
-- [ ] **Prompt Dinâmico:** O servidor Python recebe a resposta da IA, processa (usando uma API da OpenAI/Gemini) e gera o próximo prompt da fila baseado no contexto.
-- [ ] **Modo "Debate":** Configurar duas personas (ex: ChatGPT no Chrome e Gemini na API) para debaterem um tópico até chegarem a uma conclusão.
-- [ ] **Meta-Prompts:** O usuário define apenas o "Objetivo Final" (ex: "Crie um curso completo de Python") e o Agente quebra isso em 50 prompts automaticamente.
+## Fase 5: Monetização & Distribuição
+- [ ] Empacotar instalador único (Exe) para o servidor Python.
+- [ ] Publicar na Chrome Web Store.

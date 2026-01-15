@@ -1,40 +1,39 @@
-# Product Requirements Document (PRD) - AI Queue Master
+﻿# Product Requirements Document (PRD) - Queue Master PRO
 
 ## 1. Visão Geral
-O **AI Queue Master** é uma extensão de navegador e conjunto de scripts projetados para profissionais de marketing e engenheiros de prompt que precisam executar fluxos de trabalho longos e sequenciais em LLMs (ChatGPT, Gemini, Claude) sem interrupções manuais.
+O **Queue Master PRO** é uma extensão de navegador profissional projetada para automatizar fluxos de trabalho sequenciais em LLMs (ChatGPT, Gemini, etc.). Ela permite que engenheiros de prompt e criadores de conteúdo executem filas massivas de instruções sem supervisão constante.
 
-**Problema:** A criação de planos de longo prazo (ex: 90 dias de conteúdo) exige múltiplos prompts sequenciais. O usuário precisa esperar cada resposta, copiar o próximo prompt, colar e clicar em "continuar" repetidamente.
+**Versão Atual:** 2.0 (PRO)
+**Status:** Produção / Estável
 
-**Solução:** Uma ferramenta que gerencia uma fila de prompts, detecta o estado da interface da IA e executa as ações automaticamente, incluindo clicar em "Continuar Gerando" se a resposta for cortada.
+## 2. Objetivos Principais
+*   **Autonomia Total:** O usuário deve poder carregar 50+ prompts e sair da frente do computador.
+*   **Confiabilidade:** O sistema não pode pular itens ou parar prematuramente.
+*   **Persistência:** As respostas geradas devem ser salvas automaticamente para uso posterior.
+*   **Universalidade:** Funcionar nas principais interfaces de Chat AI baseadas em web.
 
-## 2. Objetivos
-*   Eliminar a intervenção manual durante a execução de uma sequência de prompts.
-*   Permitir a importação de grandes volumes de prompts (Bulk).
-*   Garantir a integridade das respostas longas (Auto-continue).
-*   Futuro: Integrar com sistema de arquivos local para salvar respostas automaticamente.
+## 3. Especificações Funcionais
 
-## 3. Especificações Funcionais (Features)
+### 3.1. Core: Gerenciamento de Fila
+*   **Bulk Loader:** Área de texto que aceita blocos de texto separados por linha vazia.
+*   **Edição em Tempo Real:** Capacidade de adicionar, remover ou limpar itens mesmo durante a execução.
+*   **Queue Status:** Indicadores visuais claros (Pendente, Processando, Concluído).
 
-### 3.1. Gerenciamento de Fila (Core)
-*   **Input:** Área de texto para colar múltiplos prompts.
-*   **Separador:** Detecção inteligente de quebras de linha duplas como separadores de prompts.
-*   **Visualização:** Lista visual dos itens na fila (Pendente, Em Progresso, Concluído).
-*   **Controle:** Botões Play, Pause, Limpar e Editar Item.
+### 3.2. Automation Engine ("The Clicker")
+*   **Smart Input:** Injeção de texto que simula digitação humana e eventos de DOM.
+*   **State Detection:** Algoritmo robusto para detectar se a IA está "Pensando", "Escrevendo" ou "Parada".
+*   **Anti-Race Condition:** Trava lógica (`isProcessing`) para impedir envios duplos.
+*   **Auto-Continue:** Detecção automática de botões de continuação para respostas longas.
 
-### 3.2. Automação de Interface (The Clicker)
-*   **Injeção de Texto:** Inserir texto nos campos `textarea` (ChatGPT) e `contenteditable` (Gemini) simulando eventos de teclado reais.
-*   **Detecção de Ociosidade:** Monitorar o botão "Stop Generating" ou "Send" para saber quando a IA terminou.
-*   **Auto-Continue:** Se o botão "Continue Generating" aparecer, clicar automaticamente sem avançar a fila de prompts.
+### 3.3. File System Integration (Local Server)
+*   **Server:** Script Python (Flask) rodando em background.
+*   **Capture:** A extensão captura o último bloco de resposta HTML/Markdown.
+*   **Save:** Salva arquivos `.md` ou `.txt` em pastas organizadas com timestamp.
 
-### 3.3. Configurações (Settings)
-*   Delay entre prompts (para evitar rate limits).
-*   Seleção do seletor CSS (caso a interface das IAs mude).
+## 4. Arquitetura
+*   **Extension (Client):** JavaScript (Vanilla) injetado via Content Script.
+*   **Server (Host):** Python Flask.
+*   **Comunicação:** Fetch API (HTTP POST) para `localhost:5000`.
 
-## 4. Requisitos Não-Funcionais
-*   **Performance:** A extensão não deve deixar o navegador lento.
-*   **Privacidade:** Nenhum dado é enviado para servidores externos (além da própria IA que o usuário já está usando). Tudo roda localmente.
-*   **Compatibilidade:** Google Chrome (Chromium-based).
-
-## 5. Arquitetura (Visão Alto Nível)
-*   **Frontend (Extension):** HTML/CSS/JS injetado via Content Script.
-*   **Backend (Future):** Python Flask Server rodando em `localhost:5000` para operações de sistema de arquivos (File I/O).
+## 5. Próximos Passos (Futuro)
+*   Ver `ROADMAP.md` e `BACKLOG.md`.
