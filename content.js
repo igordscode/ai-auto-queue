@@ -4,6 +4,7 @@ let currentIndex = 0;
 let isPanelMinimized = false;
 let autoAdvance = false;
 let isProcessing = false;
+let sessionLog = ""; // Acumulador de texto
 
 // 1. Criar e Injetar a Interface (UI)
 function createInterface() {
@@ -21,6 +22,8 @@ function createInterface() {
     <div id="panel-content">
       <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)"></textarea>
 
+      <input type="text" id="session-name" class="qm-input" placeholder="Nome do Arquivo (Opcional) - Ex: Meu_Livro">
+
       <div class="queue-controls">
         <button id="btn-load" class="queue-btn">📥 Carregar</button>
         <button id="btn-clear" class="queue-btn">🧹 Limpar</button>
@@ -28,12 +31,15 @@ function createInterface() {
 
       <div class="auto-advance-row">
         <input type="checkbox" id="chk-auto-advance">
-        <label for="chk-auto-advance">Auto-avançar & Salvar (Downloads)</label>
+        <label for="chk-auto-advance">Auto-avançar & Compilar Log</label>
       </div>
 
       <div id="queue-status" class="status-bar">Fila vazia</div>
 
-      <button id="btn-next" class="queue-btn" disabled>▶ Enviar Próximo</button>
+      <div style="display:flex; gap:5px; margin-top:5px;">
+        <button id="btn-next" class="queue-btn" disabled style="flex:1;">▶ Iniciar</button>
+        <button id="btn-download-log" class="queue-btn" style="flex:1; background:#2196F3;" title="Baixar histórico atual">💾 Baixar</button>
+      </div>
 
       <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
         <div id="queue-list"></div>
@@ -43,13 +49,31 @@ function createInterface() {
 
   document.body.appendChild(panel);
 
+  // Restore session if exists
+  const savedLog = localStorage.getItem('qm_session_log');
+  if (savedLog) {
+      sessionLog = savedLog;
+  }
+  
+  // Restore filename if exists
+  const savedName = localStorage.getItem('qm_session_name');
+  if (savedName) {
+      document.getElementById('session-name').value = savedName;
+  }
+
   // Event Listeners
   document.getElementById('btn-minimize').addEventListener('click', toggleMinimize);
   document.getElementById('btn-load').addEventListener('click', loadQueue);
   document.getElementById('btn-clear').addEventListener('click', clearQueue);
   document.getElementById('btn-next').addEventListener('click', () => sendNextPrompt(true));
+  document.getElementById('btn-download-log').addEventListener('click', () => downloadFullLog(true));
   document.getElementById('chk-auto-advance').addEventListener('change', (e) => {
     autoAdvance = e.target.checked;
+  });
+  
+  // Save filename on change
+  document.getElementById('session-name').addEventListener('input', (e) => {
+      localStorage.setItem('qm_session_name', e.target.value);
   });
 }
 
@@ -94,9 +118,11 @@ function deleteItem(index) {
 }
 
 function clearQueue() {
-  if (confirm("Limpar toda a fila?")) {
+  if (confirm("Limpar toda a fila e o histórico de log?")) {
     promptQueue = [];
     currentIndex = 0;
+    sessionLog = "";
+    localStorage.removeItem('qm_session_log');
     renderQueueList();
     updateStatus();
     document.getElementById('btn-next').disabled = true;
@@ -234,24 +260,59 @@ function updateStatusDisplay(msg) {
   document.getElementById('queue-status').textContent = msg;
 }
 
-// 4. Salvamento Nativo (Substituindo Python)
-function downloadResponse(prompt, content) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const filename = `response-${currentIndex + 1}-${timestamp}.md`;
-  const fileContent = `# Prompt:\n${prompt}\n\n# Resposta:\n${content}`;
-  
-  const blob = new Blob([fileContent], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
-  
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  
-  updateStatusDisplay(`📂 Salvo em Downloads`);
+// 4. Lógica de Log Unificado
+function appendToLog(prompt, content) {
+    const entry = `
+## Item ${currentIndex + 1}
+**Prompt:**
+${prompt}
+
+**Resposta:**
+${content}
+
+---
+`;
+    sessionLog += entry;
+    // Salva no LocalStorage para segurança contra crash
+    localStorage.setItem('qm_session_log', sessionLog);
+    console.log("Log updated");
+}
+
+function downloadFullLog(manual = false) {
+    if (!sessionLog) {
+        if(manual) alert("Nada para salvar ainda!");
+        return;
+    }
+
+    // 1. Pega o nome customizado
+    let userFilename = document.getElementById('session-name').value.trim();
+    
+    // 2. Sanitiza o nome (remove caracteres inválidos de arquivo)
+    userFilename = userFilename.replace(/[^a-z0-9_\-\s]/gi, '_');
+
+    // 3. Define nome final
+    let filename;
+    if (userFilename) {
+        filename = `${userFilename}.md`;
+    } else {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        filename = `QueueMaster-Session-${timestamp}.md`;
+    }
+
+    const header = `# Queue Master Log\nArquivo: ${filename}\nData: ${new Date().toLocaleString()}\n\n---\n`;
+    
+    const blob = new Blob([header + sessionLog], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    updateStatusDisplay(`📂 Salvo: ${filename}`);
 }
 
 function captureLastResponse() {
@@ -278,8 +339,10 @@ function monitorResponse() {
       setTimeout(() => {
         if (!isGenerating() && !checkAutoContinue()) {
           const responseText = captureLastResponse();
-          if (responseText && autoAdvance) {
-            downloadResponse(promptQueue[currentIndex], responseText);
+          if (responseText) {
+             // Em vez de baixar direto, adiciona ao log acumulado
+             appendToLog(promptQueue[currentIndex], responseText);
+             updateStatusDisplay(`📝 Item ${currentIndex + 1} registrado.`);
           }
 
           currentIndex++;
@@ -292,10 +355,14 @@ function monitorResponse() {
           if (autoAdvance && currentIndex < promptQueue.length) {
             updateStatusDisplay("🚀 Próximo em 3s...");
             setTimeout(() => sendNextPrompt(), 3000);
-          } else if (!autoAdvance) {
-             updateStatusDisplay("✅ Concluído");
           } else {
-             updateStatusDisplay("🎉 Fila Finalizada");
+             // Se acabou a fila ou o auto-advance está desligado
+             if (currentIndex >= promptQueue.length) {
+                 updateStatusDisplay("🎉 Finalizado! Baixando...");
+                 downloadFullLog(); // Baixa com o nome customizado
+             } else {
+                 updateStatusDisplay("✅ Item Concluído (Pausado)");
+             }
           }
         } else {
           updateStatusDisplay("⏳ Processando...");
