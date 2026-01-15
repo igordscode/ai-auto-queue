@@ -116,14 +116,46 @@ function getChatInput() {
 function getSendButton() {
   const chatgptBtn = document.querySelector('button[data-testid="send-button"]');
   const geminiBtn = document.querySelector('button[aria-label*="Send"]') || 
-                    document.querySelector('.send-button'); // Classe genérica, pode variar
+                    document.querySelector('.send-button'); 
                     
   return chatgptBtn || geminiBtn;
+}
+
+// NOVO: Função para detectar botão "Continuar Gerando"
+function checkAutoContinue() {
+  // ChatGPT costuma usar um botão com texto "Continue generating"
+  const buttons = Array.from(document.querySelectorAll('button'));
+  const continueBtn = buttons.find(btn => 
+    btn.textContent.toLowerCase().includes('continue generating') || 
+    btn.textContent.toLowerCase().includes('continuar gerando')
+  );
+
+  if (continueBtn) {
+    console.log("Queue Master: Botão 'Continuar' detectado! Clicando...");
+    continueBtn.click();
+    return true;
+  }
+  return false;
+}
+
+// NOVO: Função para verificar se a IA terminou de responder
+function isGenerating() {
+  // ChatGPT: O botão de "Stop generating" existe?
+  const stopBtn = document.querySelector('button[aria-label="Stop generating"]') || 
+                  document.querySelector('button[data-testid="stop-button"]');
+  
+  // Gemini: O botão de enviar vira um quadrado (Stop)? Ou o ícone de loading gira?
+  // (Lógica simplificada para Gemini, pode precisar de ajustes)
+  const geminiGenerating = document.querySelector('.gemini-generating-indicator'); 
+
+  return !!stopBtn || !!geminiGenerating;
 }
 
 function sendNextPrompt() {
   if (currentIndex >= promptQueue.length) {
     alert("Fila finalizada! 🎉");
+    document.getElementById('btn-next').disabled = true;
+    document.getElementById('btn-next').textContent = "✅ Tudo Pronto!";
     return;
   }
 
@@ -138,49 +170,77 @@ function sendNextPrompt() {
   // Inserir texto
   inputEl.focus();
   
-  // Método seguro para React/Angular (simula digitação)
-  // Para ChatGPT (textarea)
   if (inputEl.tagName === 'TEXTAREA') {
     inputEl.value = promptText;
     inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-  } 
-  // Para Gemini (div contenteditable)
-  else {
-    inputEl.innerHTML = ''; // Limpa antes
+  } else {
+    inputEl.innerHTML = ''; 
     document.execCommand('insertText', false, promptText);
   }
 
-  // Pequeno delay para o botão de enviar ativar
+  // Clicar em Enviar
   setTimeout(() => {
     const sendBtn = getSendButton();
     if (sendBtn) {
       sendBtn.click();
+      updateStatusDisplay("Enviado... Aguardando resposta ⏳");
       
-      // Atualizar estado
-      currentIndex++;
-      updateStatus();
-      renderQueueList();
-      
-      const nextBtn = document.getElementById('btn-next');
-      if (currentIndex < promptQueue.length) {
-        nextBtn.textContent = `▶ Enviar Próximo (${currentIndex + 1}/${promptQueue.length})`;
-      } else {
-        nextBtn.textContent = "✅ Tudo Pronto!";
-        nextBtn.disabled = true;
-      }
+      // Iniciar monitoramento da resposta
+      monitorResponse();
     } else {
-      // Tentar pressionar ENTER se não achar botão
+      // Fallback ENTER
       const enterEvent = new KeyboardEvent('keydown', {
         bubbles: true, cancelable: true, keyCode: 13
       });
       inputEl.dispatchEvent(enterEvent);
-      
-      // Assumir sucesso
-      currentIndex++;
-      updateStatus();
-      renderQueueList();
+      updateStatusDisplay("Enviado (Enter)... Aguardando ⏳");
+      monitorResponse();
     }
   }, 500);
+}
+
+function updateStatusDisplay(msg) {
+  const status = document.getElementById('queue-status');
+  status.textContent = msg;
+}
+
+function monitorResponse() {
+  // Verificar a cada 2 segundos
+  const monitorInterval = setInterval(() => {
+    // 1. Verificar se precisa clicar em Continuar
+    if (checkAutoContinue()) {
+      updateStatusDisplay("Auto-clique em 'Continuar' 🔄");
+      return; // Continua monitorando
+    }
+
+    // 2. Verificar se parou de gerar
+    if (!isGenerating()) {
+      // Se não está gerando e não tem botão de continuar, assumimos que acabou
+      // Damos um tempo extra de segurança (ex: 3s) para garantir que não é só um lag
+      setTimeout(() => {
+        if (!isGenerating() && !checkAutoContinue()) {
+          clearInterval(monitorInterval);
+          currentIndex++;
+          updateStatus();
+          renderQueueList();
+          
+          // Auto-trigger do próximo prompt?
+          // Por enquanto, vamos manter semi-automático (atualiza o botão)
+          // Na próxima versão, podemos fazer um checkbox "Auto-Advance"
+          const nextBtn = document.getElementById('btn-next');
+          if (currentIndex < promptQueue.length) {
+            nextBtn.textContent = `▶ Enviar Próximo (${currentIndex + 1}/${promptQueue.length})`;
+            nextBtn.disabled = false;
+            // Opcional: Se quiser totalmente automático, descomente a linha abaixo:
+            // sendNextPrompt(); 
+          } else {
+            nextBtn.textContent = "✅ Tudo Pronto!";
+            nextBtn.disabled = true;
+          }
+        }
+      }, 3000);
+    }
+  }, 2000);
 }
 
 // Inicializar ao carregar a página
