@@ -32,11 +32,7 @@
   background: #252526;
   border-bottom: 1px solid #333;
   border-radius: 12px 12px 0 0;
-  cursor: grab;
-}
-
-#ai-queue-header:active {
-  cursor: grabbing;
+  cursor: default; /* Removendo o cursor de grab */
 }
 
 #ai-queue-header span {

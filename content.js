@@ -6,6 +6,152 @@ let autoAdvance = false;
 let isProcessing = false;
 let sessionLog = "";
 
+// Sistema de Tradução
+const TRANSLATIONS = {
+    'pt': {
+        title: "QUEUE MASTER PRO",
+        placeholder: "Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)",
+        filenamePlaceholder: "Nome do arquivo (ex: Meu_Livro)",
+        load: "Carregar",
+        clear: "Limpar",
+        autoAdvance: "Auto-avançar & Compilar Log",
+        emptyQueue: "Fila vazia",
+        start: "Iniciar",
+        save: "Salvar",
+        sendNext: "Enviar Prompt",
+        done: "Concluído",
+        processing: "⏳ Processando...",
+        autoContinue: "🔄 Auto-Continue...",
+        saved: "📂 Salvo:",
+        confirmClear: "Limpar toda a fila e o histórico de log?",
+        noInput: "Caixa de entrada não encontrada!",
+        nothingToSave: "Nada para salvar!",
+        nextIn: "🚀 Próximo em 3s...",
+        finalizing: "🎉 Finalizado! Baixando...",
+        itemDone: "✅ Item Concluído (Pausado)",
+        itemRegistered: "📝 Item"
+    },
+    'en': {
+        title: "QUEUE MASTER PRO",
+        placeholder: "Paste your prompts here... (Separate blocks with empty lines)",
+        filenamePlaceholder: "Filename (e.g., My_Book)",
+        load: "Load",
+        clear: "Clear",
+        autoAdvance: "Auto-advance & Compile Log",
+        emptyQueue: "Queue empty",
+        start: "Start",
+        save: "Save",
+        sendNext: "Send Prompt",
+        done: "Done",
+        processing: "⏳ Processing...",
+        autoContinue: "🔄 Auto-Continue...",
+        saved: "📂 Saved:",
+        confirmClear: "Clear entire queue and history?",
+        noInput: "Input box not found!",
+        nothingToSave: "Nothing to save!",
+        nextIn: "🚀 Next in 3s...",
+        finalizing: "🎉 Finished! Downloading...",
+        itemDone: "✅ Item Done (Paused)",
+        itemRegistered: "📝 Item"
+    },
+    'es': {
+        title: "QUEUE MASTER PRO",
+        placeholder: "Pega tus prompts aquí... (Separa bloques con líneas vacías)",
+        filenamePlaceholder: "Nombre del archivo (ej: Mi_Libro)",
+        load: "Cargar",
+        clear: "Limpiar",
+        autoAdvance: "Auto-avanzar y Compilar Log",
+        emptyQueue: "Cola vacía",
+        start: "Iniciar",
+        save: "Guardar",
+        sendNext: "Enviar Prompt",
+        done: "Hecho",
+        processing: "⏳ Procesando...",
+        autoContinue: "🔄 Auto-Continuar...",
+        saved: "📂 Guardado:",
+        confirmClear: "¿Limpiar toda la cola y el historial?",
+        noInput: "¡Cuadro de entrada no encontrado!",
+        nothingToSave: "¡Nada que guardar!",
+        nextIn: "🚀 Siguiente en 3s...",
+        finalizing: "🎉 ¡Finalizado! Descargando...",
+        itemDone: "✅ Ítem Terminado (Pausado)",
+        itemRegistered: "📝 Ítem"
+    },
+    'fr': {
+        title: "QUEUE MASTER PRO",
+        placeholder: "Collez vos prompts ici... (Séparez les blocs par des lignes vides)",
+        filenamePlaceholder: "Nom du fichier (ex: Mon_Livre)",
+        load: "Charger",
+        clear: "Effacer",
+        autoAdvance: "Avance auto & Compil. Log",
+        emptyQueue: "File vide",
+        start: "Démarrer",
+        save: "Sauver",
+        sendNext: "Envoyer Prompt",
+        done: "Terminé",
+        processing: "⏳ Traitement...",
+        autoContinue: "🔄 Auto-Continue...",
+        saved: "📂 Sauvegardé:",
+        confirmClear: "Tout effacer ?",
+        noInput: "Zone de texte introuvable !",
+        nothingToSave: "Rien à sauver !",
+        nextIn: "🚀 Suivant dans 3s...",
+        finalizing: "🎉 Terminé ! Téléchargement...",
+        itemDone: "✅ Item Terminé (Pause)",
+        itemRegistered: "📝 Item"
+    },
+    'de': {
+        title: "QUEUE MASTER PRO",
+        placeholder: "Fügen Sie Ihre Prompts hier ein... (Blöcke durch Leerzeilen trennen)",
+        filenamePlaceholder: "Dateiname (z.B. Mein_Buch)",
+        load: "Laden",
+        clear: "Leeren",
+        autoAdvance: "Auto-Weiter & Log kompilieren",
+        emptyQueue: "Warteschlange leer",
+        start: "Starten",
+        save: "Speichern",
+        sendNext: "Senden Prompt",
+        done: "Fertig",
+        processing: "⏳ Verarbeite...",
+        autoContinue: "🔄 Auto-Fortsetzen...",
+        saved: "📂 Gespeichert:",
+        confirmClear: "Alles löschen?",
+        noInput: "Eingabefeld nicht gefunden!",
+        nothingToSave: "Nichts zu speichern!",
+        nextIn: "🚀 Nächster in 3s...",
+        finalizing: "🎉 Fertig! Herunterladen...",
+        itemDone: "✅ Element Fertig (Pausiert)",
+        itemRegistered: "📝 Element"
+    },
+    'zh': {
+        title: "QUEUE MASTER PRO",
+        placeholder: "在此粘贴您的提示...（用空行分隔块）",
+        filenamePlaceholder: "文件名（例如：我的书）",
+        load: "加载",
+        clear: "清除",
+        autoAdvance: "自动推进 & 编译日志",
+        emptyQueue: "队列为空",
+        start: "开始",
+        save: "保存",
+        sendNext: "发送提示",
+        done: "完成",
+        processing: "⏳ 处理中...",
+        autoContinue: "🔄 自动继续...",
+        saved: "📂 已保存:",
+        confirmClear: "清除整个队列和历史记录？",
+        noInput: "未找到输入框！",
+        nothingToSave: "没有可保存的内容！",
+        nextIn: "🚀 3秒后下一个...",
+        finalizing: "🎉 完成！正在下载...",
+        itemDone: "✅ 项目完成（暂停）",
+        itemRegistered: "📝 项目"
+    }
+};
+
+// Detectar idioma (Padrão: Inglês)
+const userLang = navigator.language.split('-')[0];
+const lang = TRANSLATIONS[userLang] || TRANSLATIONS['en'];
+
 const ICONS = {
     load: `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`,
     clear: `<svg viewBox="0 0 24 24"><path d="M15 16h4v2h-4v-2zm0-4h4v2h-4v-2zm0-4h4v2h-4V8zM5 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H5v10zm10-12H5V4c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v2z"/></svg>`,
@@ -23,26 +169,26 @@ function createInterface() {
   panel.id = 'ai-queue-panel';
   panel.innerHTML = `
     <div id="ai-queue-header">
-      <span>QUEUE MASTER PRO</span>
+      <span>${lang.title}</span>
       <button id="btn-minimize" title="Minimizar/Maximizar" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">
         ${ICONS.minimize}
       </button>
     </div>
     <div id="panel-content">
-      <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui..."></textarea>
-      <input type="text" id="session-name" class="qm-input" placeholder="Nome do arquivo (ex: Meu_Livro)">
+      <textarea id="ai-queue-input" placeholder="${lang.placeholder}"></textarea>
+      <input type="text" id="session-name" class="qm-input" placeholder="${lang.filenamePlaceholder}">
       <div class="queue-controls">
-        <button id="btn-load" class="queue-btn">${ICONS.load} Carregar</button>
-        <button id="btn-clear" class="queue-btn">${ICONS.clear} Limpar</button>
+        <button id="btn-load" class="queue-btn">${ICONS.load} ${lang.load}</button>
+        <button id="btn-clear" class="queue-btn">${ICONS.clear} ${lang.clear}</button>
       </div>
       <div class="auto-advance-row">
         <input type="checkbox" id="chk-auto-advance">
-        <label for="chk-auto-advance">Auto-avançar & Compilar Log</label>
+        <label for="chk-auto-advance">${lang.autoAdvance}</label>
       </div>
-      <div id="queue-status" class="status-bar">Fila vazia</div>
+      <div id="queue-status" class="status-bar">${lang.emptyQueue}</div>
       <div style="display:flex; gap:5px; margin-top:5px;">
-        <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} Iniciar</button>
-        <button id="btn-download-log" class="queue-btn" style="flex:1;">${ICONS.download} Salvar</button>
+        <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} ${lang.start}</button>
+        <button id="btn-download-log" class="queue-btn" style="flex:1;">${ICONS.download} ${lang.save}</button>
       </div>
       <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
         <div id="queue-list"></div>
@@ -71,7 +217,7 @@ function toggleMinimize() {
   isPanelMinimized = !isPanelMinimized;
   if (isPanelMinimized) {
     panel.classList.add('minimized');
-    btn.innerHTML = ICONS.play; // Ícone de Play para indicar que a fila está lá
+    btn.innerHTML = ICONS.play;
   } else {
     panel.classList.remove('minimized');
     btn.innerHTML = ICONS.minimize;
@@ -97,7 +243,7 @@ function deleteItem(index) {
 }
 
 function clearQueue() {
-  if (confirm("Limpar toda a fila e o histórico de log?")) {
+  if (confirm(lang.confirmClear)) {
     promptQueue = [];
     currentIndex = 0;
     sessionLog = "";
@@ -111,16 +257,16 @@ function clearQueue() {
 
 function updateStatus() {
   const status = document.getElementById('queue-status');
-  status.textContent = promptQueue.length === 0 ? "Fila vazia" : `${currentIndex} de ${promptQueue.length} concluídos`;
+  status.textContent = promptQueue.length === 0 ? lang.emptyQueue : `${currentIndex} / ${promptQueue.length} ${lang.done}`;
 }
 
 function updateNextButtonText() {
   const btn = document.getElementById('btn-next');
   if (currentIndex < promptQueue.length) {
-    btn.innerHTML = `${ICONS.play} Enviar Prompt ${currentIndex + 1}`;
+    btn.innerHTML = `${ICONS.play} ${lang.sendNext} ${currentIndex + 1}`;
     btn.disabled = isProcessing;
   } else {
-    btn.innerHTML = `Concluído`;
+    btn.innerHTML = lang.done;
     btn.disabled = true;
   }
 }
@@ -171,7 +317,7 @@ function isGenerating() {
 function sendNextPrompt(manualClick = false) {
   if (currentIndex >= promptQueue.length || isProcessing) return;
   const inputEl = getChatInput();
-  if (!inputEl) { alert("Caixa de entrada não encontrada!"); return; }
+  if (!inputEl) { alert(lang.noInput); return; }
   isProcessing = true;
   updateNextButtonText();
   const promptText = promptQueue[currentIndex];
@@ -193,7 +339,7 @@ function sendNextPrompt(manualClick = false) {
     const btn = getSendButton();
     if (btn) btn.click();
     else { inputEl.dispatchEvent(new KeyboardEvent('keydown', { bubbles:true, cancelable:true, keyCode:13, key:'Enter' })); }
-    updateStatusDisplay("⏳ Processando...");
+    updateStatusDisplay(lang.processing);
     monitorResponse();
   }, 600);
 }
@@ -201,12 +347,12 @@ function sendNextPrompt(manualClick = false) {
 function updateStatusDisplay(msg) { document.getElementById('queue-status').textContent = msg; }
 
 function appendToLog(prompt, content) {
-    sessionLog += `\n## Item ${currentIndex + 1}\n**Prompt:**\n${prompt}\n\n**Resposta:**\n${content}\n\n---\n`;
+    sessionLog += `\n## ${lang.itemRegistered} ${currentIndex + 1}\n**Prompt:**\n${prompt}\n\n**Resposta:**\n${content}\n\n---\n`;
     localStorage.setItem('qm_session_log', sessionLog);
 }
 
 function downloadFullLog(manual = false) {
-    if (!sessionLog) { if(manual) alert("Nada para salvar!"); return; }
+    if (!sessionLog) { if(manual) alert(lang.nothingToSave); return; }
     let userFilename = document.getElementById('session-name').value.trim().replace(/[^a-z0-9_\-\s]/gi, '_');
     const filename = userFilename ? `${userFilename}.md` : `QueueMaster-Log-${Date.now()}.md`;
     const blob = new Blob([`# Queue Master Log\n\n${sessionLog}`], { type: 'text/markdown' });
@@ -216,7 +362,7 @@ function downloadFullLog(manual = false) {
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
-    updateStatusDisplay(`📂 Salvo: ${filename}`);
+    updateStatusDisplay(`${lang.saved} ${filename}`);
 }
 
 function captureLastResponse() {
@@ -240,9 +386,10 @@ function monitorResponse() {
           renderQueueList();
           updateNextButtonText();
           if (autoAdvance && currentIndex < promptQueue.length) {
-            updateStatusDisplay("🚀 Próximo em 3s...");
+            updateStatusDisplay(lang.nextIn);
             setTimeout(() => sendNextPrompt(), 3000);
           } else if (currentIndex >= promptQueue.length) {
+            updateStatusDisplay(lang.finalizing);
             downloadFullLog();
           }
         } else { monitorResponse(); }
