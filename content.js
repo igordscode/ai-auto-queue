@@ -3,7 +3,6 @@ let promptQueue = [];
 let currentIndex = 0;
 let isPanelMinimized = false;
 let autoAdvance = false;
-let serverOnline = false;
 
 // 1. Criar e Injetar a Interface (UI)
 function createInterface() {
@@ -13,14 +12,11 @@ function createInterface() {
   panel.id = 'ai-queue-panel';
   panel.innerHTML = `
     <div id="ai-queue-header">
-      <span>Queue Master PRO 🚀</span>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <div id="server-indicator" title="Servidor Offline" style="width:8px; height:8px; border-radius:50%; background:#555;"></div>
-        <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
-      </div>
+      <span>Queue Master Lite 🤖</span>
+      <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
     </div>
     <div id="panel-content">
-      <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)"></textarea>
+      <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui... (Separe blocos com linha vazia)"></textarea>
       
       <div class="queue-controls">
         <button id="btn-load" class="queue-btn">📥 Carregar</button>
@@ -29,7 +25,7 @@ function createInterface() {
 
       <div class="auto-advance-row">
         <input type="checkbox" id="chk-auto-advance">
-        <label for="chk-auto-advance">Auto-avançar & Salvar</label>
+        <label for="chk-auto-advance">Auto-avançar (Cuidado! 🔥)</label>
       </div>
 
       <div id="queue-status" class="status-bar">Fila vazia</div>
@@ -52,8 +48,6 @@ function createInterface() {
   document.getElementById('chk-auto-advance').addEventListener('change', (e) => {
     autoAdvance = e.target.checked;
   });
-
-  checkServerConnection();
 }
 
 // 2. Funções da Interface
@@ -234,59 +228,6 @@ function updateStatusDisplay(msg) {
   document.getElementById('queue-status').textContent = msg;
 }
 
-// 4. Integração com Servidor (Capture & Save)
-async function checkServerConnection() {
-  try {
-    const res = await fetch('http://localhost:5000/health');
-    if (res.ok) {
-      serverOnline = true;
-      const indicator = document.getElementById('server-indicator');
-      if (indicator) {
-        indicator.style.background = '#00ff00';
-        indicator.title = "Servidor Conectado - Salvamento Automático Ativo";
-      }
-    }
-  } catch (e) {
-    serverOnline = false;
-    const indicator = document.getElementById('server-indicator');
-    if (indicator) {
-      indicator.style.background = '#555';
-      indicator.title = "Servidor Offline - Inicie o server.py para salvar arquivos";
-    }
-  }
-}
-
-function captureLastResponse() {
-  // Estratégia Genérica: Pegar o último elemento de texto da IA
-  // ChatGPT: .markdown
-  // Gemini: .model-response-text ou similar
-  
-  const responses = document.querySelectorAll('.markdown, .model-response-text, .message-content');
-  if (responses.length > 0) {
-    const lastResponse = responses[responses.length - 1];
-    return lastResponse.innerText;
-  }
-  return null;
-}
-
-async function saveResponseToServer(prompt, content) {
-  if (!serverOnline) return;
-  
-  try {
-    const res = await fetch('http://localhost:5000/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, content })
-    });
-    const data = await res.json();
-    console.log("Salvo:", data);
-    updateStatusDisplay(`💾 Salvo: ${data.file}`);
-  } catch (e) {
-    console.error("Erro ao salvar:", e);
-    updateStatusDisplay("❌ Erro ao salvar");
-  }
-}
-
 function monitorResponse() {
   const check = setInterval(() => {
     if (checkAutoContinue()) {
@@ -295,17 +236,10 @@ function monitorResponse() {
     }
 
     if (!isGenerating()) {
-      setTimeout(async () => {
+      setTimeout(() => {
         if (!isGenerating() && !checkAutoContinue()) {
           clearInterval(check);
           
-          // CAPTURAR E SALVAR
-          const responseText = captureLastResponse();
-          if (responseText && serverOnline) {
-            updateStatusDisplay("💾 Salvando...");
-            await saveResponseToServer(promptQueue[currentIndex], responseText);
-          }
-
           currentIndex++;
           updateStatus();
           renderQueueList();
@@ -325,4 +259,3 @@ function monitorResponse() {
 
 createInterface();
 setInterval(createInterface, 3000);
-setInterval(checkServerConnection, 5000); // Verificar servidor a cada 5s
