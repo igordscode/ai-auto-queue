@@ -57,3 +57,31 @@ The interface automatically adapts to your browser's language:
 ---
 
 *Maximize your AI productivity with Queue Master PRO.*
+
+---
+
+## 👨‍💻 Author & Support
+
+Created with ❤️ by **[igordscode](https://github.com/igordscode)**.
+
+If this tool saved you time, consider checking out my other projects or starring this repository!
+
+[![GitHub stars](https://img.shields.io/github/stars/igordscode/ai-auto-queue?style=social)](https://github.com/igordscode/ai-auto-queue)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+---
+
+## ☕ Support & Credits
+
+**Created and maintained by [igordscode](https://github.com/igordscode).**
+
+If this tool saved you time, consider checking out my other projects or starring this repository!
+
+> "Empowering creators with automation."
+
+## 📜 License
+This project is licensed under the [MIT License](LICENSE) - feel free to use, modify, and distribute.

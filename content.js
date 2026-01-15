@@ -190,8 +190,13 @@ function createInterface() {
         <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} ${lang.start}</button>
         <button id="btn-download-log" class="queue-btn" style="flex:1;">${ICONS.download} ${lang.save}</button>
       </div>
-      <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
+            <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
         <div id="queue-list"></div>
+      </div>
+      <div id="ai-queue-footer">
+        <a href="https://github.com/igordscode/ai-auto-queue" target="_blank" title="Visit GitHub Repo">
+          Made by igordscode ☕
+        </a>
       </div>
     </div>
   `;
@@ -400,3 +405,4 @@ function monitorResponse() {
 
 createInterface();
 setInterval(createInterface, 3000);
+
