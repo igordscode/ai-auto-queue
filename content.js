@@ -2,38 +2,52 @@
 let promptQueue = [];
 let currentIndex = 0;
 let isPanelMinimized = false;
+let autoAdvance = false;
 
 // 1. Criar e Injetar a Interface (UI)
 function createInterface() {
+  if (document.getElementById('ai-queue-panel')) return;
+
   const panel = document.createElement('div');
   panel.id = 'ai-queue-panel';
   panel.innerHTML = `
     <div id="ai-queue-header">
-      <span>Queue Master 🤖</span>
-      <button id="btn-minimize">_</button>
+      <span>Queue Master PRO 🚀</span>
+      <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
     </div>
     <div id="panel-content">
-      <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui.
-Separe-os por uma linha vazia."></textarea>
+      <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)"></textarea>
+      
       <div class="queue-controls">
-        <button id="btn-load" class="queue-btn">Carregar Fila</button>
-        <button id="btn-clear" class="queue-btn">Limpar</button>
+        <button id="btn-load" class="queue-btn">📥 Carregar</button>
+        <button id="btn-clear" class="queue-btn">🧹 Limpar</button>
       </div>
+
+      <div class="auto-advance-row">
+        <input type="checkbox" id="chk-auto-advance">
+        <label for="chk-auto-advance">Auto-avançar (Cuidado! 🔥)</label>
+      </div>
+
       <div id="queue-status" class="status-bar">Fila vazia</div>
-      <div class="queue-controls" style="margin-top: 10px;">
-        <button id="btn-next" class="queue-btn" disabled>▶ Enviar Próximo</button>
+      
+      <button id="btn-next" class="queue-btn" disabled>▶ Enviar Próximo</button>
+      
+      <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+        <div id="queue-list"></div>
       </div>
-      <div id="queue-list" style="max-height: 150px; overflow-y: auto; margin-top: 10px;"></div>
     </div>
   `;
 
   document.body.appendChild(panel);
 
-  // Adicionar Event Listeners
+  // Event Listeners
   document.getElementById('btn-minimize').addEventListener('click', toggleMinimize);
   document.getElementById('btn-load').addEventListener('click', loadQueue);
   document.getElementById('btn-clear').addEventListener('click', clearQueue);
-  document.getElementById('btn-next').addEventListener('click', sendNextPrompt);
+  document.getElementById('btn-next').addEventListener('click', () => sendNextPrompt(true));
+  document.getElementById('chk-auto-advance').addEventListener('change', (e) => {
+    autoAdvance = e.target.checked;
+  });
 }
 
 // 2. Funções da Interface
@@ -41,17 +55,16 @@ function toggleMinimize() {
   const panel = document.getElementById('ai-queue-panel');
   const content = document.getElementById('panel-content');
   const btn = document.getElementById('btn-minimize');
-  
   isPanelMinimized = !isPanelMinimized;
   
   if (isPanelMinimized) {
     panel.classList.add('minimized');
-    btn.textContent = '+';
+    btn.textContent = '▢';
     content.style.display = 'none';
   } else {
     panel.classList.remove('minimized');
     btn.textContent = '_';
-    content.style.display = 'block';
+    content.style.display = 'flex';
   }
 }
 
@@ -59,25 +72,35 @@ function loadQueue() {
   const text = document.getElementById('ai-queue-input').value;
   if (!text.trim()) return;
 
-  // Separar por linhas duplas (blocos de texto)
-  promptQueue = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
-  currentIndex = 0;
+  // Split por linhas duplas ou múltiplas novas linhas (Bulk)
+  const newPrompts = text.split(/\n\s*\n/).map(p => p.trim()).filter(p => p !== '');
+  promptQueue = [...promptQueue, ...newPrompts];
   
   updateStatus();
   renderQueueList();
   
   document.getElementById('btn-next').disabled = false;
-  document.getElementById('btn-next').textContent = `▶ Enviar Próximo (1/${promptQueue.length})`;
+  updateNextButtonText();
+}
+
+function deleteItem(index) {
+  promptQueue.splice(index, 1);
+  if (currentIndex > index) currentIndex--;
+  if (currentIndex >= promptQueue.length && promptQueue.length > 0) currentIndex = promptQueue.length - 1;
+  
+  renderQueueList();
+  updateStatus();
+  updateNextButtonText();
 }
 
 function clearQueue() {
-  promptQueue = [];
-  currentIndex = 0;
-  document.getElementById('ai-queue-input').value = '';
-  document.getElementById('queue-list').innerHTML = '';
-  updateStatus();
-  document.getElementById('btn-next').disabled = true;
-  document.getElementById('btn-next').textContent = "▶ Enviar Próximo";
+  if (confirm("Limpar toda a fila?")) {
+    promptQueue = [];
+    currentIndex = 0;
+    renderQueueList();
+    updateStatus();
+    document.getElementById('btn-next').disabled = true;
+  }
 }
 
 function updateStatus() {
@@ -85,7 +108,18 @@ function updateStatus() {
   if (promptQueue.length === 0) {
     status.textContent = "Fila vazia";
   } else {
-    status.textContent = `${currentIndex} concluídos de ${promptQueue.length}`;
+    status.textContent = `${currentIndex} de ${promptQueue.length} concluídos`;
+  }
+}
+
+function updateNextButtonText() {
+  const btn = document.getElementById('btn-next');
+  if (currentIndex < promptQueue.length) {
+    btn.textContent = `▶ Enviar Prompt ${currentIndex + 1}`;
+    btn.disabled = false;
+  } else {
+    btn.textContent = "✅ Fila Finalizada";
+    btn.disabled = true;
   }
 }
 
@@ -95,35 +129,40 @@ function renderQueueList() {
   
   promptQueue.forEach((prompt, index) => {
     const item = document.createElement('div');
-    item.className = 'queue-item';
-    if (index === currentIndex) item.classList.add('active');
-    if (index < currentIndex) item.classList.add('done');
-    item.textContent = prompt.substring(0, 50) + (prompt.length > 50 ? '...' : '');
+    item.className = `queue-item ${index === currentIndex ? 'active' : ''} ${index < currentIndex ? 'done' : ''}`;
+    
+    const text = document.createElement('span');
+    text.textContent = `${index + 1}. ${prompt.substring(0, 40)}${prompt.length > 40 ? '...' : ''}`;
+    
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-item-del';
+    delBtn.innerHTML = '🗑️';
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      deleteItem(index);
+    };
+
+    item.appendChild(text);
+    item.appendChild(delBtn);
     list.appendChild(item);
   });
 }
 
-// 3. Lógica de Envio (A Mágica)
+// 3. Automação de Site
 function getChatInput() {
-  // Tentar seletores conhecidos do ChatGPT e Gemini
-  const chatgptInput = document.querySelector('#prompt-textarea');
-  const geminiInput = document.querySelector('div[contenteditable="true"].ql-editor') || 
-                      document.querySelector('rich-textarea div[contenteditable="true"]');
-  
-  return chatgptInput || geminiInput;
+  return document.querySelector('#prompt-textarea') || // ChatGPT
+         document.querySelector('div[contenteditable="true"].ql-editor') || // Gemini
+         document.querySelector('rich-textarea div[contenteditable="true"]') || // Gemini alternative
+         document.querySelector('div[contenteditable="true"]'); // Generic
 }
 
 function getSendButton() {
-  const chatgptBtn = document.querySelector('button[data-testid="send-button"]');
-  const geminiBtn = document.querySelector('button[aria-label*="Send"]') || 
-                    document.querySelector('.send-button'); 
-                    
-  return chatgptBtn || geminiBtn;
+  return document.querySelector('button[data-testid="send-button"]') || // ChatGPT
+         document.querySelector('button[aria-label*="Send"]') || // Gemini
+         document.querySelector('.send-button');
 }
 
-// NOVO: Função para detectar botão "Continuar Gerando"
 function checkAutoContinue() {
-  // ChatGPT costuma usar um botão com texto "Continue generating"
   const buttons = Array.from(document.querySelectorAll('button'));
   const continueBtn = buttons.find(btn => 
     btn.textContent.toLowerCase().includes('continue generating') || 
@@ -131,121 +170,97 @@ function checkAutoContinue() {
   );
 
   if (continueBtn) {
-    console.log("Queue Master: Botão 'Continuar' detectado! Clicando...");
+    console.log("Queue Master: Clicando em 'Continuar'...");
     continueBtn.click();
     return true;
   }
   return false;
 }
 
-// NOVO: Função para verificar se a IA terminou de responder
 function isGenerating() {
-  // ChatGPT: O botão de "Stop generating" existe?
   const stopBtn = document.querySelector('button[aria-label="Stop generating"]') || 
-                  document.querySelector('button[data-testid="stop-button"]');
+                  document.querySelector('button[data-testid="stop-button"]') ||
+                  document.querySelector('button[aria-label="Stop"]'); // Gemini stop icon
   
-  // Gemini: O botão de enviar vira um quadrado (Stop)? Ou o ícone de loading gira?
-  // (Lógica simplificada para Gemini, pode precisar de ajustes)
-  const geminiGenerating = document.querySelector('.gemini-generating-indicator'); 
-
-  return !!stopBtn || !!geminiGenerating;
+  return !!stopBtn;
 }
 
-function sendNextPrompt() {
-  if (currentIndex >= promptQueue.length) {
-    alert("Fila finalizada! 🎉");
-    document.getElementById('btn-next').disabled = true;
-    document.getElementById('btn-next').textContent = "✅ Tudo Pronto!";
+function sendNextPrompt(manualClick = false) {
+  if (currentIndex >= promptQueue.length) return;
+
+  const inputEl = getChatInput();
+  if (!inputEl) {
+    alert("Caixa de entrada não encontrada!");
     return;
   }
 
   const promptText = promptQueue[currentIndex];
-  const inputEl = getChatInput();
-
-  if (!inputEl) {
-    alert("Erro: Não encontrei a caixa de texto do chat. O site mudou?");
-    return;
-  }
-
-  // Inserir texto
   inputEl.focus();
   
   if (inputEl.tagName === 'TEXTAREA') {
     inputEl.value = promptText;
     inputEl.dispatchEvent(new Event('input', { bubbles: true }));
   } else {
-    inputEl.innerHTML = ''; 
-    document.execCommand('insertText', false, promptText);
+    // Para campos editáveis (Gemini)
+    const selection = window.getSelection();
+    const range = document.createRange();
+    inputEl.innerHTML = '';
+    const textNode = document.createTextNode(promptText);
+    inputEl.appendChild(textNode);
+    range.selectNodeContents(inputEl);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
-  // Clicar em Enviar
   setTimeout(() => {
-    const sendBtn = getSendButton();
-    if (sendBtn) {
-      sendBtn.click();
-      updateStatusDisplay("Enviado... Aguardando resposta ⏳");
-      
-      // Iniciar monitoramento da resposta
-      monitorResponse();
-    } else {
-      // Fallback ENTER
-      const enterEvent = new KeyboardEvent('keydown', {
-        bubbles: true, cancelable: true, keyCode: 13
-      });
-      inputEl.dispatchEvent(enterEvent);
-      updateStatusDisplay("Enviado (Enter)... Aguardando ⏳");
-      monitorResponse();
+    const btn = getSendButton();
+    if (btn) btn.click();
+    else {
+      // Simular Enter
+      const enter = new KeyboardEvent('keydown', { bubbles:true, cancelable:true, keyCode:13, key:'Enter' });
+      inputEl.dispatchEvent(enter);
     }
-  }, 500);
+    
+    updateStatusDisplay("⏳ Processando...");
+    monitorResponse();
+  }, 600);
 }
 
 function updateStatusDisplay(msg) {
-  const status = document.getElementById('queue-status');
-  status.textContent = msg;
+  document.getElementById('queue-status').textContent = msg;
 }
 
 function monitorResponse() {
-  // Verificar a cada 2 segundos
-  const monitorInterval = setInterval(() => {
-    // 1. Verificar se precisa clicar em Continuar
+  const check = setInterval(() => {
     if (checkAutoContinue()) {
-      updateStatusDisplay("Auto-clique em 'Continuar' 🔄");
-      return; // Continua monitorando
+      updateStatusDisplay("🔄 Auto-Continue...");
+      return;
     }
 
-    // 2. Verificar se parou de gerar
     if (!isGenerating()) {
-      // Se não está gerando e não tem botão de continuar, assumimos que acabou
-      // Damos um tempo extra de segurança (ex: 3s) para garantir que não é só um lag
+      // Pequeno delay para garantir que terminou mesmo
       setTimeout(() => {
         if (!isGenerating() && !checkAutoContinue()) {
-          clearInterval(monitorInterval);
+          clearInterval(check);
           currentIndex++;
           updateStatus();
           renderQueueList();
+          updateNextButtonText();
           
-          // Auto-trigger do próximo prompt?
-          // Por enquanto, vamos manter semi-automático (atualiza o botão)
-          // Na próxima versão, podemos fazer um checkbox "Auto-Advance"
-          const nextBtn = document.getElementById('btn-next');
-          if (currentIndex < promptQueue.length) {
-            nextBtn.textContent = `▶ Enviar Próximo (${currentIndex + 1}/${promptQueue.length})`;
-            nextBtn.disabled = false;
-            // Opcional: Se quiser totalmente automático, descomente a linha abaixo:
-            // sendNextPrompt(); 
+          if (autoAdvance && currentIndex < promptQueue.length) {
+            updateStatusDisplay("🚀 Próximo em 3s...");
+            setTimeout(sendNextPrompt, 3000);
           } else {
-            nextBtn.textContent = "✅ Tudo Pronto!";
-            nextBtn.disabled = true;
+            updateStatusDisplay("✅ Concluído");
           }
         }
-      }, 3000);
+      }, 2000);
     }
   }, 2000);
 }
 
-// Inicializar ao carregar a página
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', createInterface);
-} else {
-  createInterface();
-}
+// Iniciar
+createInterface();
+// Re-checar interface periodicamente (caso o site faça navegação SPA)
+setInterval(createInterface, 3000);
