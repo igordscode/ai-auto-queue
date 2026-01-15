@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Prompt Queue Master",
+  "version": "1.0",
+  "description": "Automate sending sequential prompts to AI chats.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
