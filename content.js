@@ -4,7 +4,17 @@ let currentIndex = 0;
 let isPanelMinimized = false;
 let autoAdvance = false;
 let isProcessing = false;
-let sessionLog = ""; // Acumulador de texto
+let sessionLog = "";
+
+const ICONS = {
+    load: `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`,
+    clear: `<svg viewBox="0 0 24 24"><path d="M15 16h4v2h-4v-2zm0-4h4v2h-4v-2zm0-4h4v2h-4V8zM5 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H5v10zm10-12H5V4c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v2z"/></svg>`,
+    play: `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
+    download: `<svg viewBox="0 0 24 24"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg>`,
+    delete: `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`,
+    minimize: `<svg viewBox="0 0 24 24"><path d="M6 19h12v2H6v-2z"/></svg>`,
+    maximize: `<svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>`
+};
 
 // 1. Criar e Injetar a Interface (UI)
 function createInterface() {
@@ -14,19 +24,19 @@ function createInterface() {
   panel.id = 'ai-queue-panel';
   panel.innerHTML = `
     <div id="ai-queue-header">
-      <span>Queue Master LITE 🚀</span>
+      <span>QUEUE MASTER PRO</span>
       <div style="display:flex; gap:10px; align-items:center;">
-        <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
+        <button id="btn-minimize" class="btn-item-del" style="color: #aaa;">${ICONS.minimize}</button>
       </div>
     </div>
     <div id="panel-content">
       <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)"></textarea>
 
-      <input type="text" id="session-name" class="qm-input" placeholder="Nome do Arquivo (Opcional) - Ex: Meu_Livro">
+      <input type="text" id="session-name" class="qm-input" placeholder="Nome do arquivo (ex: Meu_Livro)">
 
       <div class="queue-controls">
-        <button id="btn-load" class="queue-btn">📥 Carregar</button>
-        <button id="btn-clear" class="queue-btn">🧹 Limpar</button>
+        <button id="btn-load" class="queue-btn">${ICONS.load} Carregar</button>
+        <button id="btn-clear" class="queue-btn">${ICONS.clear} Limpar</button>
       </div>
 
       <div class="auto-advance-row">
@@ -37,8 +47,8 @@ function createInterface() {
       <div id="queue-status" class="status-bar">Fila vazia</div>
 
       <div style="display:flex; gap:5px; margin-top:5px;">
-        <button id="btn-next" class="queue-btn" disabled style="flex:1;">▶ Iniciar</button>
-        <button id="btn-download-log" class="queue-btn" style="flex:1; background:#2196F3;" title="Baixar histórico atual">💾 Baixar</button>
+        <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} Iniciar</button>
+        <button id="btn-download-log" class="queue-btn" style="flex:1;" title="Baixar histórico atual">${ICONS.download} Salvar</button>
       </div>
 
       <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
@@ -49,19 +59,12 @@ function createInterface() {
 
   document.body.appendChild(panel);
 
-  // Restore session if exists
   const savedLog = localStorage.getItem('qm_session_log');
-  if (savedLog) {
-      sessionLog = savedLog;
-  }
+  if (savedLog) sessionLog = savedLog;
   
-  // Restore filename if exists
   const savedName = localStorage.getItem('qm_session_name');
-  if (savedName) {
-      document.getElementById('session-name').value = savedName;
-  }
+  if (savedName) document.getElementById('session-name').value = savedName;
 
-  // Event Listeners
   document.getElementById('btn-minimize').addEventListener('click', toggleMinimize);
   document.getElementById('btn-load').addEventListener('click', loadQueue);
   document.getElementById('btn-clear').addEventListener('click', clearQueue);
@@ -71,7 +74,6 @@ function createInterface() {
     autoAdvance = e.target.checked;
   });
   
-  // Save filename on change
   document.getElementById('session-name').addEventListener('input', (e) => {
       localStorage.setItem('qm_session_name', e.target.value);
   });
@@ -86,11 +88,11 @@ function toggleMinimize() {
 
   if (isPanelMinimized) {
     panel.classList.add('minimized');
-    btn.textContent = '□';
+    btn.innerHTML = ICONS.maximize;
     content.style.display = 'none';
   } else {
     panel.classList.remove('minimized');
-    btn.textContent = '_';
+    btn.innerHTML = ICONS.minimize;
     content.style.display = 'flex';
   }
 }
@@ -142,10 +144,10 @@ function updateStatus() {
 function updateNextButtonText() {
   const btn = document.getElementById('btn-next');
   if (currentIndex < promptQueue.length) {
-    btn.textContent = `▶ Enviar Prompt ${currentIndex + 1}`;
+    btn.innerHTML = `${ICONS.play} Enviar Prompt ${currentIndex + 1}`;
     btn.disabled = isProcessing;
   } else {
-    btn.textContent = "✅ Fila Finalizada";
+    btn.innerHTML = `Concluído`;
     btn.disabled = true;
   }
 }
@@ -163,7 +165,7 @@ function renderQueueList() {
 
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-item-del';
-    delBtn.innerHTML = '🗑️';
+    delBtn.innerHTML = ICONS.delete;
     delBtn.onclick = (e) => {
       e.stopPropagation();
       deleteItem(index);
@@ -175,7 +177,7 @@ function renderQueueList() {
   });
 }
 
-// 3. Automação de Site
+// 3. Automação de Site (Mantido)
 function getChatInput() {
   return document.querySelector('#prompt-textarea') ||
          document.querySelector('div[contenteditable="true"].ql-editor') ||
@@ -197,7 +199,6 @@ function checkAutoContinue() {
   );
 
   if (continueBtn) {
-    console.log("Queue Master: Clicando em 'Continuar'...");
     continueBtn.click();
     return true;
   }
@@ -208,13 +209,11 @@ function isGenerating() {
   const stopBtn = document.querySelector('button[aria-label="Stop generating"]') ||
                   document.querySelector('button[data-testid="stop-button"]') ||
                   document.querySelector('button[aria-label="Stop"]');
-
   return !!stopBtn;
 }
 
 function sendNextPrompt(manualClick = false) {
-  if (currentIndex >= promptQueue.length) return;
-  if (isProcessing) return; 
+  if (currentIndex >= promptQueue.length || isProcessing) return;
 
   const inputEl = getChatInput();
   if (!inputEl) {
@@ -250,7 +249,6 @@ function sendNextPrompt(manualClick = false) {
       const enter = new KeyboardEvent('keydown', { bubbles:true, cancelable:true, keyCode:13, key:'Enter' });
       inputEl.dispatchEvent(enter);
     }
-
     updateStatusDisplay("⏳ Processando...");
     monitorResponse();
   }, 600);
@@ -260,112 +258,57 @@ function updateStatusDisplay(msg) {
   document.getElementById('queue-status').textContent = msg;
 }
 
-// 4. Lógica de Log Unificado
+// 4. Lógica de Log
 function appendToLog(prompt, content) {
-    const entry = `
-## Item ${currentIndex + 1}
-**Prompt:**
-${prompt}
-
-**Resposta:**
-${content}
-
----
-`;
+    const entry = `\n## Item ${currentIndex + 1}\n**Prompt:**\n${prompt}\n\n**Resposta:**\n${content}\n\n---\n`;
     sessionLog += entry;
-    // Salva no LocalStorage para segurança contra crash
     localStorage.setItem('qm_session_log', sessionLog);
-    console.log("Log updated");
 }
 
 function downloadFullLog(manual = false) {
     if (!sessionLog) {
-        if(manual) alert("Nada para salvar ainda!");
+        if(manual) alert("Nada para salvar!");
         return;
     }
-
-    // 1. Pega o nome customizado
-    let userFilename = document.getElementById('session-name').value.trim();
-    
-    // 2. Sanitiza o nome (remove caracteres inválidos de arquivo)
-    userFilename = userFilename.replace(/[^a-z0-9_\-\s]/gi, '_');
-
-    // 3. Define nome final
-    let filename;
-    if (userFilename) {
-        filename = `${userFilename}.md`;
-    } else {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        filename = `QueueMaster-Session-${timestamp}.md`;
-    }
-
-    const header = `# Queue Master Log\nArquivo: ${filename}\nData: ${new Date().toLocaleString()}\n\n---\n`;
-    
-    const blob = new Blob([header + sessionLog], { type: 'text/markdown' });
+    let userFilename = document.getElementById('session-name').value.trim().replace(/[^a-z0-9_\-\s]/gi, '_');
+    const filename = userFilename ? `${userFilename}.md` : `QueueMaster-Log-${Date.now()}.md`;
+    const blob = new Blob([`# Queue Master Log\n\n${sessionLog}`], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
-    
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
     updateStatusDisplay(`📂 Salvo: ${filename}`);
 }
 
 function captureLastResponse() {
   const responses = document.querySelectorAll('.markdown, .model-response-text, .message-content');       
-  if (responses.length > 0) {
-    const lastResponse = responses[responses.length - 1];
-    return lastResponse.innerText;
-  }
-  return null;
+  return responses.length > 0 ? responses[responses.length - 1].innerText : null;
 }
 
 function monitorResponse() {
   if (window.monitorInterval) clearInterval(window.monitorInterval);
-
   window.monitorInterval = setInterval(() => {
-    if (checkAutoContinue()) {
-      updateStatusDisplay("🔄 Auto-Continue...");
-      return;
-    }
-
+    if (checkAutoContinue()) return;
     if (!isGenerating()) {
       clearInterval(window.monitorInterval);
-
       setTimeout(() => {
         if (!isGenerating() && !checkAutoContinue()) {
           const responseText = captureLastResponse();
-          if (responseText) {
-             // Em vez de baixar direto, adiciona ao log acumulado
-             appendToLog(promptQueue[currentIndex], responseText);
-             updateStatusDisplay(`📝 Item ${currentIndex + 1} registrado.`);
-          }
-
+          if (responseText) appendToLog(promptQueue[currentIndex], responseText);
           currentIndex++;
           isProcessing = false;
-          
           updateStatus();
           renderQueueList();
           updateNextButtonText();
-
           if (autoAdvance && currentIndex < promptQueue.length) {
             updateStatusDisplay("🚀 Próximo em 3s...");
             setTimeout(() => sendNextPrompt(), 3000);
-          } else {
-             // Se acabou a fila ou o auto-advance está desligado
-             if (currentIndex >= promptQueue.length) {
-                 updateStatusDisplay("🎉 Finalizado! Baixando...");
-                 downloadFullLog(); // Baixa com o nome customizado
-             } else {
-                 updateStatusDisplay("✅ Item Concluído (Pausado)");
-             }
+          } else if (currentIndex >= promptQueue.length) {
+            downloadFullLog();
           }
         } else {
-          updateStatusDisplay("⏳ Processando...");
           monitorResponse();
         }
       }, 2000);
