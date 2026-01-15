@@ -3,6 +3,7 @@ let promptQueue = [];
 let currentIndex = 0;
 let isPanelMinimized = false;
 let autoAdvance = false;
+let serverOnline = false;
 
 // 1. Criar e Injetar a Interface (UI)
 function createInterface() {
@@ -13,7 +14,10 @@ function createInterface() {
   panel.innerHTML = `
     <div id="ai-queue-header">
       <span>Queue Master PRO 🚀</span>
-      <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div id="server-indicator" title="Servidor Offline" style="width:8px; height:8px; border-radius:50%; background:#555;"></div>
+        <button id="btn-minimize" style="background:none; border:none; color:#aaa; cursor:pointer;">_</button>
+      </div>
     </div>
     <div id="panel-content">
       <textarea id="ai-queue-input" placeholder="Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)"></textarea>
@@ -25,7 +29,7 @@ function createInterface() {
 
       <div class="auto-advance-row">
         <input type="checkbox" id="chk-auto-advance">
-        <label for="chk-auto-advance">Auto-avançar (Cuidado! 🔥)</label>
+        <label for="chk-auto-advance">Auto-avançar & Salvar</label>
       </div>
 
       <div id="queue-status" class="status-bar">Fila vazia</div>
@@ -48,6 +52,8 @@ function createInterface() {
   document.getElementById('chk-auto-advance').addEventListener('change', (e) => {
     autoAdvance = e.target.checked;
   });
+
+  checkServerConnection();
 }
 
 // 2. Funções da Interface
@@ -72,7 +78,6 @@ function loadQueue() {
   const text = document.getElementById('ai-queue-input').value;
   if (!text.trim()) return;
 
-  // Split por linhas duplas ou múltiplas novas linhas (Bulk)
   const newPrompts = text.split(/\n\s*\n/).map(p => p.trim()).filter(p => p !== '');
   promptQueue = [...promptQueue, ...newPrompts];
   
@@ -150,15 +155,15 @@ function renderQueueList() {
 
 // 3. Automação de Site
 function getChatInput() {
-  return document.querySelector('#prompt-textarea') || // ChatGPT
-         document.querySelector('div[contenteditable="true"].ql-editor') || // Gemini
-         document.querySelector('rich-textarea div[contenteditable="true"]') || // Gemini alternative
-         document.querySelector('div[contenteditable="true"]'); // Generic
+  return document.querySelector('#prompt-textarea') || 
+         document.querySelector('div[contenteditable="true"].ql-editor') || 
+         document.querySelector('rich-textarea div[contenteditable="true"]') || 
+         document.querySelector('div[contenteditable="true"]');
 }
 
 function getSendButton() {
-  return document.querySelector('button[data-testid="send-button"]') || // ChatGPT
-         document.querySelector('button[aria-label*="Send"]') || // Gemini
+  return document.querySelector('button[data-testid="send-button"]') || 
+         document.querySelector('button[aria-label*="Send"]') || 
          document.querySelector('.send-button');
 }
 
@@ -180,7 +185,7 @@ function checkAutoContinue() {
 function isGenerating() {
   const stopBtn = document.querySelector('button[aria-label="Stop generating"]') || 
                   document.querySelector('button[data-testid="stop-button"]') ||
-                  document.querySelector('button[aria-label="Stop"]'); // Gemini stop icon
+                  document.querySelector('button[aria-label="Stop"]');
   
   return !!stopBtn;
 }
@@ -201,7 +206,6 @@ function sendNextPrompt(manualClick = false) {
     inputEl.value = promptText;
     inputEl.dispatchEvent(new Event('input', { bubbles: true }));
   } else {
-    // Para campos editáveis (Gemini)
     const selection = window.getSelection();
     const range = document.createRange();
     inputEl.innerHTML = '';
@@ -217,7 +221,6 @@ function sendNextPrompt(manualClick = false) {
     const btn = getSendButton();
     if (btn) btn.click();
     else {
-      // Simular Enter
       const enter = new KeyboardEvent('keydown', { bubbles:true, cancelable:true, keyCode:13, key:'Enter' });
       inputEl.dispatchEvent(enter);
     }
@@ -231,6 +234,59 @@ function updateStatusDisplay(msg) {
   document.getElementById('queue-status').textContent = msg;
 }
 
+// 4. Integração com Servidor (Capture & Save)
+async function checkServerConnection() {
+  try {
+    const res = await fetch('http://localhost:5000/health');
+    if (res.ok) {
+      serverOnline = true;
+      const indicator = document.getElementById('server-indicator');
+      if (indicator) {
+        indicator.style.background = '#00ff00';
+        indicator.title = "Servidor Conectado - Salvamento Automático Ativo";
+      }
+    }
+  } catch (e) {
+    serverOnline = false;
+    const indicator = document.getElementById('server-indicator');
+    if (indicator) {
+      indicator.style.background = '#555';
+      indicator.title = "Servidor Offline - Inicie o server.py para salvar arquivos";
+    }
+  }
+}
+
+function captureLastResponse() {
+  // Estratégia Genérica: Pegar o último elemento de texto da IA
+  // ChatGPT: .markdown
+  // Gemini: .model-response-text ou similar
+  
+  const responses = document.querySelectorAll('.markdown, .model-response-text, .message-content');
+  if (responses.length > 0) {
+    const lastResponse = responses[responses.length - 1];
+    return lastResponse.innerText;
+  }
+  return null;
+}
+
+async function saveResponseToServer(prompt, content) {
+  if (!serverOnline) return;
+  
+  try {
+    const res = await fetch('http://localhost:5000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, content })
+    });
+    const data = await res.json();
+    console.log("Salvo:", data);
+    updateStatusDisplay(`💾 Salvo: ${data.file}`);
+  } catch (e) {
+    console.error("Erro ao salvar:", e);
+    updateStatusDisplay("❌ Erro ao salvar");
+  }
+}
+
 function monitorResponse() {
   const check = setInterval(() => {
     if (checkAutoContinue()) {
@@ -239,10 +295,17 @@ function monitorResponse() {
     }
 
     if (!isGenerating()) {
-      // Pequeno delay para garantir que terminou mesmo
-      setTimeout(() => {
+      setTimeout(async () => {
         if (!isGenerating() && !checkAutoContinue()) {
           clearInterval(check);
+          
+          // CAPTURAR E SALVAR
+          const responseText = captureLastResponse();
+          if (responseText && serverOnline) {
+            updateStatusDisplay("💾 Salvando...");
+            await saveResponseToServer(promptQueue[currentIndex], responseText);
+          }
+
           currentIndex++;
           updateStatus();
           renderQueueList();
@@ -250,8 +313,8 @@ function monitorResponse() {
           
           if (autoAdvance && currentIndex < promptQueue.length) {
             updateStatusDisplay("🚀 Próximo em 3s...");
-            setTimeout(sendNextPrompt, 3000);
-          } else {
+            setTimeout(() => sendNextPrompt(), 3000);
+          } else if (!autoAdvance) {
             updateStatusDisplay("✅ Concluído");
           }
         }
@@ -260,7 +323,6 @@ function monitorResponse() {
   }, 2000);
 }
 
-// Iniciar
 createInterface();
-// Re-checar interface periodicamente (caso o site faça navegação SPA)
 setInterval(createInterface, 3000);
+setInterval(checkServerConnection, 5000); // Verificar servidor a cada 5s
