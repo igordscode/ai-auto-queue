@@ -10,7 +10,7 @@ let sessionLog = "";
 const TRANSLATIONS = {
     'pt': {
         title: "AI PROMPT QUEUE",
-        placeholder: "Cole seus prompts aqui... (Cada bloco separado por linha vazia será um item da fila)",
+        placeholder: "Cole seus prompts aqui.\n\nExemplo:\nPrompt 1: Crie um título...\n\n(Deixe uma linha vazia)\n\nPrompt 2: Agora escreva o texto...",
         filenamePlaceholder: "Nome do arquivo (ex: Meu_Livro)",
         load: "Carregar",
         clear: "Limpar",
@@ -33,7 +33,7 @@ const TRANSLATIONS = {
     },
     'en': {
         title: "AI PROMPT QUEUE",
-        placeholder: "Paste your prompts here... (Separate blocks with empty lines)",
+        placeholder: "Paste your prompts here.\n\nExample:\nPrompt 1: Create a title...\n\n(Leave an empty line)\n\nPrompt 2: Now write the text...",
         filenamePlaceholder: "Filename (e.g., My_Book)",
         load: "Load",
         clear: "Clear",
@@ -56,7 +56,7 @@ const TRANSLATIONS = {
     },
     'es': {
         title: "AI PROMPT QUEUE",
-        placeholder: "Pega tus prompts aquí... (Separa bloques con líneas vacías)",
+        placeholder: "Pega tus prompts aquí.\n\nEjemplo:\nPrompt 1: Crea un título...\n\n(Deja una línea vacía)\n\nPrompt 2: Ahora escribe el texto...",
         filenamePlaceholder: "Nombre del archivo (ej: Mi_Libro)",
         load: "Cargar",
         clear: "Limpiar",
@@ -79,7 +79,7 @@ const TRANSLATIONS = {
     },
     'fr': {
         title: "AI PROMPT QUEUE",
-        placeholder: "Collez vos prompts ici... (Séparez les blocs par des lignes vides)",
+        placeholder: "Collez vos prompts ici.\n\nExemple:\nPrompt 1: Créez un titre...\n\n(Laissez une ligne vide)\n\nPrompt 2: Maintenant écrivez...",
         filenamePlaceholder: "Nom du fichier (ex: Mon_Livre)",
         load: "Charger",
         clear: "Effacer",
@@ -102,7 +102,7 @@ const TRANSLATIONS = {
     },
     'de': {
         title: "AI PROMPT QUEUE",
-        placeholder: "Fügen Sie Ihre Prompts hier ein... (Blöcke durch Leerzeilen trennen)",
+        placeholder: "Fügen Sie Ihre Prompts hier ein.\n\nBeispiel:\nPrompt 1: Erstellen Sie einen Titel...\n\n(Leerzeile lassen)\n\nPrompt 2: Jetzt schreiben...",
         filenamePlaceholder: "Dateiname (z.B. Mein_Buch)",
         load: "Laden",
         clear: "Leeren",
@@ -125,7 +125,7 @@ const TRANSLATIONS = {
     },
     'zh': {
         title: "AI PROMPT QUEUE",
-        placeholder: "在此粘贴您的提示...（用空行分隔块）",
+        placeholder: "在此粘贴提示。\n\n示例：\n提示 1：创建一个标题...\n\n（留空行）\n\n提示 2：现在写正文...",
         filenamePlaceholder: "文件名（例如：我的书）",
         load: "加载",
         clear: "清除",
@@ -190,7 +190,7 @@ function createInterface() {
         <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} ${lang.start}</button>
         <button id="btn-download-log" class="queue-btn" style="flex:1;">${ICONS.download} ${lang.save}</button>
       </div>
-            <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
+      <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
         <div id="queue-list"></div>
       </div>
       <div id="ai-queue-footer">
@@ -405,5 +405,3 @@ function monitorResponse() {
 
 createInterface();
 setInterval(createInterface, 3000);
-
-
