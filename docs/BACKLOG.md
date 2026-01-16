@@ -1,15 +1,20 @@
 ﻿# Backlog de Desenvolvimento
 
-## Melhorias Técnicas
-- [ ] **Tratamento de Erro de Rede:** Pausar a fila e alertar se a internet cair ou o chat der erro 500.
-- [ ] **Persistência de Fila:** Salvar a fila no LocalStorage para não perder os prompts se fechar a aba sem querer.
-- [ ] **Delay Customizável:** Input para o usuário definir quantos segundos esperar entre prompts.
+## 🌟 User Feedback / UX 2.0 (Prioridade Alta)
+- [ ] **Lista Editável (Smart Cards):** Após carregar o texto "Bulk", transformar os itens da lista em inputs editáveis individualmente.
+- [ ] **Drag & Drop:** Permitir reordenar os itens da fila arrastando-os para cima ou para baixo.
+- [ ] **UI Colapsável Lateral:** Estudar transformar o painel em uma "Sidebar" retrátil em vez de um modal flutuante.
 
-## Novas Features
-- [ ] **Importar Arquivo:** Botão para carregar prompts direto de um arquivo .txt ou .csv.
-- [ ] **Retry Automático:** Tentar reenviar o prompt se der erro de "Something went wrong".
-- [ ] **Modo "Loop":** Repetir a mesma fila X vezes.
+## 🧠 Core Features (Agente/Pro)
+- [ ] **Suporte Multimodal (Imagens):** Permitir upload de imagem junto com o prompt na fila.
+- [ ] **Modo Loop:** Repetir a mesma fila X vezes.
+- [ ] **Importar Arquivo:** Carregar prompts direto de .txt ou .csv.
 
-## UI/UX
-- [ ] **Temas:** Permitir que o usuário escolha cores do painel.
-- [ ] **Barra de Progresso:** Visualização gráfica da porcentagem concluída.
+## ⚙️ Melhorias Técnicas
+- [ ] **Tratamento de Erro de Rede:** Pausar a fila e alertar se a internet cair.
+- [ ] **Persistência Local:** Salvar a fila no LocalStorage para não perder os dados se fechar a aba.
+- [ ] **Delay Customizável:** Input para o usuário definir o tempo de espera (hoje fixo em 3s).
+
+## 🎨 UI/UX Geral
+- [ ] **Temas:** Opção de cores claras/escuras.
+- [ ] **Barra de Progresso:** Visualização gráfica (%) do andamento da fila.

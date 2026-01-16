@@ -1,24 +1,29 @@
-﻿# Product Requirements Document (PRD) - Queue Master Series
+﻿# Product Requirements Document (PRD) - AI Prompt Queue Master
 
-## 1. Estratégia de Produto
-O projeto foi dividido em duas camadas para reduzir a fricção de entrada e criar um funil de vendas:
+## 1. Visão do Produto
+O **AI Prompt Queue Master** é uma ferramenta de produtividade "Plug & Play" para profissionais que usam IA generativa em escala. Diferente de scripts simples, ele oferece uma experiência de usuário (UX) robusta, segura e internacionalizada.
 
-### A. Queue Master LITE (Versão Atual)
-*   **Target:** Usuários comuns, produtores de conteúdo.
-*   **Arquitetura:** Standalone (Apenas Extensão).
-*   **Diferencial:** Zero setup. Salva arquivos via API de Download do navegador.
+**Status Atual:** v2.2 (Estável)
+**Arquitetura:** Standalone Chrome Extension (No-Backend).
 
-### B. Queue Master AGENT/PRO (Futuro)
-*   **Target:** Power users, desenvolvedores, empresas.
-*   **Arquitetura:** Híbrida (Extensão + Python Backend).
-*   **Diferencial:** Orquestração dinâmica, conexão com APIs externas, lógica de decisão baseada em contexto.
+## 2. Pilares de Valor
+1.  **Zero Fricção:** Instalar e usar. Sem config de servidor ou API keys.
+2.  **Confiabilidade:** Algoritmos de detecção de estado garantem que a fila nunca trave ou pule itens.
+3.  **Organização:** O usuário entra com caos (50 prompts soltos) e sai com ordem (1 arquivo Markdown formatado).
 
-## 2. Especificações (LITE)
-*   **Queue Management:** Fila de prompts injetada no DOM.
-*   **Smart Monitoring:** Monitoramento de botões de status da IA.
-*   **Native Saving:** Download automático de arquivos .md para a pasta Downloads do usuário.
+## 3. Funcionalidades Core (v2.x)
+*   **Bulk Loader:** Entrada de texto massiva.
+*   **Auto-Advance:** Navegação automática com delay de segurança.
+*   **Smart Auto-Save:** Compilação de sessão em arquivo único (.md).
+*   **i18n Engine:** Detecção automática de idioma do navegador.
+*   **UI Resiliente:** Painel flutuante não-intrusivo com minimização inteligente.
 
-## 3. Roadmmap Simplificado
-- [x] LITE: Standalone extension.
-- [x] LITE: Bug fixes (pular itens).
-- [ ] AGENT: Início do desenvolvimento da lógica de decisão.
+## 4. Próximos Passos (Planejamento v3.0)
+*   **Melhoria de Edição:** Transição de "Lista Estática" para "Cards Interativos" (Editáveis/Reordenáveis).
+*   **Multimodalidade:** Capacidade de processar imagens.
+*   **Cross-Platform:** Suporte oficial para Claude e Perplexity.
+
+## 5. Métricas de Sucesso
+*   Taxa de conclusão de filas longas (>10 itens) sem erros.
+*   Downloads realizados com sucesso.
+*   Feedback de usabilidade da UI (minimizar/maximizar).
