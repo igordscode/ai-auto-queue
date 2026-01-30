@@ -1,4 +1,4 @@
-﻿// Variáveis de Estado
+// Variáveis de Estado
 let promptQueue = [];
 let currentIndex = 0;
 let isPanelMinimized = false;
@@ -9,7 +9,7 @@ let sessionLog = "";
 // Sistema de Tradução
 const TRANSLATIONS = {
     'pt': {
-        title: "AI PROMPT QUEUE",
+        title: "AI PROMPT QUEUE v3",
         placeholder: "Cole seus prompts aqui.\n\nExemplo:\nPrompt 1: Crie um título...\n\n(Deixe uma linha vazia)\n\nPrompt 2: Agora escreva o texto...",
         filenamePlaceholder: "Nome do arquivo (ex: Meu_Livro)",
         load: "Carregar",
@@ -29,10 +29,19 @@ const TRANSLATIONS = {
         nextIn: "🚀 Próximo em 3s...",
         finalizing: "🎉 Finalizado! Baixando...",
         itemDone: "✅ Item Concluído (Pausado)",
-        itemRegistered: "📝 Item"
+        itemRegistered: "📝 Item",
+        tabQueue: "FILA MANUAL",
+        tabAgent: "AGENTE AUTO",
+        agentGoalPlaceholder: "Qual é o seu objetivo?\nEx: Escreva um curso de Python para iniciantes com 5 capítulos.",
+        agentBtnPlan: "🧠 Planejar com IA",
+        agentBtnApprove: "✅ Aprovar e Carregar",
+        agentBtnAnalyze: "🧐 Analisar e Sugerir",
+        planning: "🤔 Pensando...",
+        analyzing: "🔎 Analisando...",
+        planError: "Erro ao processar"
     },
     'en': {
-        title: "AI PROMPT QUEUE",
+        title: "AI PROMPT QUEUE v3",
         placeholder: "Paste your prompts here.\n\nExample:\nPrompt 1: Create a title...\n\n(Leave an empty line)\n\nPrompt 2: Now write the text...",
         filenamePlaceholder: "Filename (e.g., My_Book)",
         load: "Load",
@@ -52,99 +61,16 @@ const TRANSLATIONS = {
         nextIn: "🚀 Next in 3s...",
         finalizing: "🎉 Finished! Downloading...",
         itemDone: "✅ Item Done (Paused)",
-        itemRegistered: "📝 Item"
-    },
-    'es': {
-        title: "AI PROMPT QUEUE",
-        placeholder: "Pega tus prompts aquí.\n\nEjemplo:\nPrompt 1: Crea un título...\n\n(Deja una línea vacía)\n\nPrompt 2: Ahora escribe el texto...",
-        filenamePlaceholder: "Nombre del archivo (ej: Mi_Libro)",
-        load: "Cargar",
-        clear: "Limpiar",
-        autoAdvance: "Auto-avanzar y Compilar Log",
-        emptyQueue: "Cola vacía",
-        start: "Iniciar",
-        save: "Guardar",
-        sendNext: "Enviar Prompt",
-        done: "Hecho",
-        processing: "⏳ Procesando...",
-        autoContinue: "🔄 Auto-Continuar...",
-        saved: "📂 Guardado:",
-        confirmClear: "¿Limpiar toda la cola y el historial?",
-        noInput: "¡Cuadro de entrada no encontrado!",
-        nothingToSave: "¡Nada que guardar!",
-        nextIn: "🚀 Siguiente en 3s...",
-        finalizing: "🎉 ¡Finalizado! Descargando...",
-        itemDone: "✅ Ítem Terminado (Pausado)",
-        itemRegistered: "📝 Ítem"
-    },
-    'fr': {
-        title: "AI PROMPT QUEUE",
-        placeholder: "Collez vos prompts ici.\n\nExemple:\nPrompt 1: Créez un titre...\n\n(Laissez une ligne vide)\n\nPrompt 2: Maintenant écrivez...",
-        filenamePlaceholder: "Nom du fichier (ex: Mon_Livre)",
-        load: "Charger",
-        clear: "Effacer",
-        autoAdvance: "Avance auto & Compil. Log",
-        emptyQueue: "File vide",
-        start: "Démarrer",
-        save: "Sauver",
-        sendNext: "Envoyer Prompt",
-        done: "Terminé",
-        processing: "⏳ Traitement...",
-        autoContinue: "🔄 Auto-Continue...",
-        saved: "📂 Sauvegardé:",
-        confirmClear: "Tout effacer ?",
-        noInput: "Zone de texte introuvable !",
-        nothingToSave: "Rien à sauver !",
-        nextIn: "🚀 Suivant dans 3s...",
-        finalizing: "🎉 Terminé ! Téléchargement...",
-        itemDone: "✅ Item Terminé (Pause)",
-        itemRegistered: "📝 Item"
-    },
-    'de': {
-        title: "AI PROMPT QUEUE",
-        placeholder: "Fügen Sie Ihre Prompts hier ein.\n\nBeispiel:\nPrompt 1: Erstellen Sie einen Titel...\n\n(Leerzeile lassen)\n\nPrompt 2: Jetzt schreiben...",
-        filenamePlaceholder: "Dateiname (z.B. Mein_Buch)",
-        load: "Laden",
-        clear: "Leeren",
-        autoAdvance: "Auto-Weiter & Log kompilieren",
-        emptyQueue: "Warteschlange leer",
-        start: "Starten",
-        save: "Speichern",
-        sendNext: "Senden Prompt",
-        done: "Fertig",
-        processing: "⏳ Verarbeite...",
-        autoContinue: "🔄 Auto-Fortsetzen...",
-        saved: "📂 Gespeichert:",
-        confirmClear: "Alles löschen?",
-        noInput: "Eingabefeld nicht gefunden!",
-        nothingToSave: "Nichts zu speichern!",
-        nextIn: "🚀 Nächster in 3s...",
-        finalizing: "🎉 Fertig! Herunterladen...",
-        itemDone: "✅ Element Fertig (Pausiert)",
-        itemRegistered: "📝 Element"
-    },
-    'zh': {
-        title: "AI PROMPT QUEUE",
-        placeholder: "在此粘贴提示。\n\n示例：\n提示 1：创建一个标题...\n\n（留空行）\n\n提示 2：现在写正文...",
-        filenamePlaceholder: "文件名（例如：我的书）",
-        load: "加载",
-        clear: "清除",
-        autoAdvance: "自动推进 & 编译日志",
-        emptyQueue: "队列为空",
-        start: "开始",
-        save: "保存",
-        sendNext: "发送提示",
-        done: "完成",
-        processing: "⏳ 处理中...",
-        autoContinue: "🔄 自动继续...",
-        saved: "📂 已保存:",
-        confirmClear: "清除整个队列和历史记录？",
-        noInput: "未找到输入框！",
-        nothingToSave: "没有可保存的内容！",
-        nextIn: "🚀 3秒后下一个...",
-        finalizing: "🎉 完成！正在下载...",
-        itemDone: "✅ 项目完成（暂停）",
-        itemRegistered: "📝 项目"
+        itemRegistered: "📝 Item",
+        tabQueue: "MANUAL QUEUE",
+        tabAgent: "AUTO AGENT",
+        agentGoalPlaceholder: "What is your goal?\ne.g., Write a Python course for beginners with 5 chapters.",
+        agentBtnPlan: "🧠 Plan with AI",
+        agentBtnApprove: "✅ Approve & Load",
+        agentBtnAnalyze: "🧐 Analyze & Pivot",
+        planning: "🤔 Thinking...",
+        analyzing: "🔎 Analyzing...",
+        planError: "Process Error"
     }
 };
 
@@ -174,30 +100,62 @@ function createInterface() {
         ${ICONS.minimize}
       </button>
     </div>
+    
     <div id="panel-content">
-      <textarea id="ai-queue-input" placeholder="${lang.placeholder}"></textarea>
-      <input type="text" id="session-name" class="qm-input" placeholder="${lang.filenamePlaceholder}">
-      <div class="queue-controls">
-        <button id="btn-load" class="queue-btn">${ICONS.load} ${lang.load}</button>
-        <button id="btn-clear" class="queue-btn">${ICONS.clear} ${lang.clear}</button>
-      </div>
-      <div class="auto-advance-row">
-        <input type="checkbox" id="chk-auto-advance">
-        <label for="chk-auto-advance">${lang.autoAdvance}</label>
-      </div>
-      <div id="queue-status" class="status-bar">${lang.emptyQueue}</div>
-      <div style="display:flex; gap:5px; margin-top:5px;">
-        <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} ${lang.start}</button>
-        <button id="btn-download-log" class="queue-btn" style="flex:1;">${ICONS.download} ${lang.save}</button>
-      </div>
-      <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
-        <div id="queue-list"></div>
-      </div>
-      <div id="ai-queue-footer">
-        <a href="https://github.com/igordscode/ai-auto-queue" target="_blank" title="Visit GitHub Repo">
-          Made by igordscode ☕
-        </a>
-      </div>
+        <!-- Tabs -->
+        <div class="queue-tabs">
+            <button class="queue-tab active" data-tab="tab-manual">${lang.tabQueue}</button>
+            <button class="queue-tab" data-tab="tab-agent">${lang.tabAgent}</button>
+        </div>
+
+        <!-- Manual Queue Content -->
+        <div id="tab-manual" class="tab-content active">
+            <textarea id="ai-queue-input" placeholder="${lang.placeholder}"></textarea>
+            <div class="queue-controls" style="margin-top:8px;">
+                <button id="btn-load" class="queue-btn">${ICONS.load} ${lang.load}</button>
+                <button id="btn-clear" class="queue-btn">${ICONS.clear} ${lang.clear}</button>
+            </div>
+        </div>
+
+        <!-- Agent Mode Content -->
+        <div id="tab-agent" class="tab-content">
+            <div class="agent-form">
+                <textarea id="agent-goal" class="agent-input" placeholder="${lang.agentGoalPlaceholder}"></textarea>
+                <div style="display:flex; gap:5px;">
+                    <button id="btn-agent-plan" class="agent-btn" style="flex:1;">${lang.agentBtnPlan}</button>
+                    <button id="btn-agent-analyze" class="agent-btn" style="flex:1; background:#2980b9;">${lang.agentBtnAnalyze}</button>
+                </div>
+            </div>
+            <div id="agent-analysis-result" class="analysis-box" style="display:none;"></div>
+            <div id="agent-plan-preview" class="plan-preview" style="display:none;"></div>
+            <button id="btn-agent-approve" class="agent-btn" style="display:none; margin-top:10px; background: #27ae60;">${lang.agentBtnApprove}</button>
+        </div>
+
+        <div style="border-top: 1px solid #333; margin: 10px 0;"></div>
+
+        <input type="text" id="session-name" class="qm-input" placeholder="${lang.filenamePlaceholder}">
+        
+        <div class="auto-advance-row">
+            <input type="checkbox" id="chk-auto-advance">
+            <label for="chk-auto-advance">${lang.autoAdvance}</label>
+        </div>
+        
+        <div id="queue-status" class="status-bar">${lang.emptyQueue}</div>
+        
+        <div style="display:flex; gap:5px; margin-top:5px;">
+            <button id="btn-next" class="queue-btn" disabled style="flex:1;">${ICONS.play} ${lang.start}</button>
+            <button id="btn-download-log" class="queue-btn" style="flex:1;">${ICONS.download} ${lang.save}</button>
+        </div>
+        
+        <div id="queue-list-container" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">      
+            <div id="queue-list"></div>
+        </div>
+        
+        <div id="ai-queue-footer">
+            <a href="https://github.com/igordscode/ai-auto-queue" target="_blank" title="Visit GitHub Repo">
+            Made by igordscode ☕
+            </a>
+        </div>
     </div>
   `;
   document.body.appendChild(panel);
@@ -207,6 +165,21 @@ function createInterface() {
   const savedName = localStorage.getItem('qm_session_name');
   if (savedName) document.getElementById('session-name').value = savedName;
 
+  // Event Listeners for Tabs
+  document.querySelectorAll('.queue-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+          document.querySelectorAll('.queue-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          e.target.classList.add('active');
+          document.getElementById(e.target.dataset.tab).classList.add('active');
+      });
+  });
+
+  // Agent Listeners
+  document.getElementById('btn-agent-plan').addEventListener('click', generatePlan);
+  document.getElementById('btn-agent-analyze').addEventListener('click', analyzeChat);
+  document.getElementById('btn-agent-approve').addEventListener('click', approvePlan);
+
   document.getElementById('btn-minimize').addEventListener('click', toggleMinimize);
   document.getElementById('btn-load').addEventListener('click', loadQueue);
   document.getElementById('btn-clear').addEventListener('click', clearQueue);
@@ -215,6 +188,180 @@ function createInterface() {
   document.getElementById('chk-auto-advance').addEventListener('change', (e) => autoAdvance = e.target.checked);
   document.getElementById('session-name').addEventListener('input', (e) => localStorage.setItem('qm_session_name', e.target.value));
 }
+
+// --- Agent Functions ---
+
+async function generatePlan() {
+    const goal = document.getElementById('agent-goal').value;
+    const btn = document.getElementById('btn-agent-plan');
+    const preview = document.getElementById('agent-plan-preview');
+    const analysisBox = document.getElementById('agent-analysis-result');
+    
+    if (!goal.trim()) return alert(lang.noInput);
+
+    btn.disabled = true;
+    btn.textContent = lang.planning;
+    preview.innerHTML = '';
+    preview.style.display = 'none';
+    analysisBox.style.display = 'none';
+    document.getElementById('btn-agent-approve').style.display = 'none';
+
+    try {
+        const response = await fetch('http://localhost:5000/api/plan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ goal: goal })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            window.agentPlan = data.plan; 
+            renderPlanPreview(data.plan);
+        } else {
+            alert('Error: ' + (data.message || lang.planError));
+        }
+    } catch (e) {
+        alert(lang.planError + ': ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = lang.agentBtnPlan;
+    }
+}
+
+async function analyzeChat() {
+    const btn = document.getElementById('btn-agent-analyze');
+    const analysisBox = document.getElementById('agent-analysis-result');
+    
+    btn.disabled = true;
+    btn.textContent = lang.analyzing;
+    analysisBox.style.display = 'none';
+
+    // Capturar todo o conteúdo do chat visível
+    const chatContent = Array.from(document.querySelectorAll('.markdown, .model-response-text, .message-content'))
+        .map(el => el.innerText)
+        .join('\n\n---\n\n');
+
+    if (!chatContent) {
+        alert('No chat content found to analyze!');
+        btn.disabled = false;
+        btn.textContent = lang.agentBtnAnalyze;
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:5000/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: chatContent })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // Limpar conteúdo anterior
+            analysisBox.innerHTML = '';
+            
+            // 1. Renderizar Texto da Análise
+            const analysisText = data.analysis.analysis_markdown || "No analysis text returned.";
+            const textContainer = document.createElement('div');
+            textContainer.innerHTML = `<h3>Analysis Result</h3>` + analysisText.replace(/\n/g, '<br>');
+            analysisBox.appendChild(textContainer);
+            
+            // 2. Renderizar Botões de Sugestão (DOM real para funcionar o click)
+            const prompts = data.analysis.suggested_prompts || [];
+            if (prompts.length > 0) {
+                const separator = document.createElement('div');
+                separator.style.cssText = "margin-top:15px; border-top:1px solid #333; padding-top:10px;";
+                separator.innerHTML = `<h4 style="color:#27ae60; margin:0 0 8px 0;">🚀 Recommended Next Steps</h4>`;
+                analysisBox.appendChild(separator);
+                
+                prompts.forEach((p, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'plan-item';
+                    item.style.cssText = "border-left-color: #27ae60; cursor:pointer; margin-bottom: 8px; transition: background 0.2s;";
+                    item.onmouseover = () => item.style.background = 'rgba(39, 174, 96, 0.1)';
+                    item.onmouseout = () => item.style.background = 'rgba(255,255,255,0.05)';
+                    
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong>Option ${idx + 1}</strong>
+                            <span style="font-size:10px; background:#27ae60; color:white; padding:2px 6px; border-radius:4px;">CLICK TO ADD</span>
+                        </div>
+                        <p>${p}</p>
+                    `;
+                    
+                    // Adicionar Listener de Clique Seguro
+                    item.addEventListener('click', function() {
+                        addSuggestedPrompt(p);
+                    });
+                    
+                    analysisBox.appendChild(item);
+                });
+            }
+
+            analysisBox.style.display = 'block';
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (e) {
+        alert(lang.planError + ': ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = lang.agentBtnAnalyze;
+    }
+}
+
+function addSuggestedPrompt(promptText) {
+    promptQueue.push(promptText);
+    updateStatus();
+    renderQueueList();
+    updateNextButtonText();
+    
+    // Trocar para a aba Manual para o usuário ver
+    document.querySelector('[data-tab="tab-manual"]').click();
+    
+    // Feedback visual
+    const notification = document.createElement('div');
+    notification.textContent = "Prompt Added to Queue! 🚀";
+    notification.style.cssText = "position:fixed; bottom:20px; right:20px; background:#27ae60; color:white; padding:10px 20px; border-radius:5px; z-index:1000000; font-size:12px; box-shadow:0 4px 10px rgba(0,0,0,0.3);";
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 2000);
+}
+
+function renderPlanPreview(plan) {
+    const container = document.getElementById('agent-plan-preview');
+    container.style.display = 'block';
+    
+    let html = '';
+    plan.forEach(step => {
+        html += `
+            <div class="plan-item">
+                <h4>Step ${step.step}</h4>
+                <p>${step.description}</p>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    document.getElementById('btn-agent-approve').style.display = 'flex';
+}
+
+function approvePlan() {
+    if (!window.agentPlan) return;
+    const prompts = window.agentPlan.map(p => p.prompt);
+    promptQueue = [...promptQueue, ...prompts];
+    updateStatus();
+    renderQueueList();
+    updateNextButtonText();
+    document.querySelector('[data-tab="tab-manual"]').click();
+    window.agentPlan = null;
+    document.getElementById('agent-goal').value = '';
+    document.getElementById('agent-plan-preview').style.display = 'none';
+    document.getElementById('btn-agent-approve').style.display = 'none';
+}
+
+// --- End Agent Functions ---
 
 function toggleMinimize() {
   const panel = document.getElementById('ai-queue-panel');
@@ -283,7 +430,7 @@ function renderQueueList() {
     const item = document.createElement('div');
     item.className = `queue-item ${index === currentIndex ? 'active' : ''} ${index < currentIndex ? 'done' : ''}`;
     const text = document.createElement('span');
-    text.textContent = `${index + 1}. ${prompt.substring(0, 40)}${prompt.length > 40 ? '...' : ''}`;      
+    text.textContent = `${index + 1}. ${prompt.substring(0, 40)}${prompt.length > 40 ? '...' : ''}`;
     const delBtn = document.createElement('button');
     delBtn.className = 'btn-item-del';
     delBtn.innerHTML = ICONS.delete;

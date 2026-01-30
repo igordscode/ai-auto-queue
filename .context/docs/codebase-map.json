@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-01-29T20:41:50.962Z",
+  "stack": {
+    "primaryLanguage": "javascript",
+    "languages": [
+      "javascript"
+    ],
+    "frameworks": [],
+    "buildTools": [],
+    "testFrameworks": [],
+    "packageManager": null,
+    "isMonorepo": false,
+    "hasDocker": false,
+    "hasCI": false
+  },
+  "structure": {
+    "totalFiles": 11,
+    "topDirectories": [
+      {
+        "name": "content.js",
+        "fileCount": 1
+      },
+      {
+        "name": "docs",
+        "fileCount": 6
+      },
+      {
+        "name": "LICENSE",
+        "fileCount": 1
+      },
+      {
+        "name": "manifest.json",
+        "fileCount": 1
+      },
+      {
+        "name": "README.md",
+        "fileCount": 1
+      },
+      {
+        "name": "styles.css",
+        "fileCount": 1
+      }
+    ],
+    "languageDistribution": [
+      {
+        "extension": ".md",
+        "count": 6
+      },
+      {
+        "extension": ".css",
+        "count": 1
+      },
+      {
+        "extension": ".json",
+        "count": 1
+      },
+      {
+        "extension": ".js",
+        "count": 1
+      },
+      {
+        "extension": ".html",
+        "count": 1
+      }
+    ]
+  },
+  "architecture": {
+    "layers": [],
+    "patterns": [],
+    "entryPoints": []
+  },
+  "symbols": {
+    "classes": [],
+    "interfaces": [],
+    "functions": [
+      {
+        "name": "appendToLog",
+        "kind": "function",
+        "file": "content.js",
+        "line": 354,
+        "exported": false
+      },
+      {
+        "name": "captureLastResponse",
+        "kind": "function",
+        "file": "content.js",
+        "line": 373,
+        "exported": false
+      },
+      {
+        "name": "checkAutoContinue",
+        "kind": "function",
+        "file": "content.js",
+        "line": 310,
+        "exported": false
+      },
+      {
+        "name": "clearQueue",
+        "kind": "function",
+        "file": "content.js",
+        "line": 250,
+        "exported": false
+      },
+      {
+        "name": "createInterface",
+        "kind": "function",
+        "file": "content.js",
+        "line": 165,
+        "exported": false
+      },
+      {
+        "name": "deleteItem",
+        "kind": "function",
+        "file": "content.js",
+        "line": 242,
+        "exported": false
+      },
+      {
+        "name": "downloadFullLog",
+        "kind": "function",
+        "file": "content.js",
+        "line": 359,
+        "exported": false
+      },
+      {
+        "name": "getChatInput",
+        "kind": "function",
+        "file": "content.js",
+        "line": 297,
+        "exported": false
+      },
+      {
+        "name": "getSendButton",
+        "kind": "function",
+        "file": "content.js",
+        "line": 304,
+        "exported": false
+      },
+      {
+        "name": "isGenerating",
+        "kind": "function",
+        "file": "content.js",
+        "line": 317,
+        "exported": false
+      },
+      {
+        "name": "loadQueue",
+        "kind": "function",
+        "file": "content.js",
+        "line": 232,
+        "exported": false
+      },
+      {
+        "name": "monitorResponse",
+        "kind": "function",
+        "file": "content.js",
+        "line": 378,
+        "exported": false
+      },
+      {
+        "name": "renderQueueList",
+        "kind": "function",
+        "file": "content.js",
+        "line": 279,
+        "exported": false
+      },
+      {
+        "name": "sendNextPrompt",
+        "kind": "function",
+        "file": "content.js",
+        "line": 322,
+        "exported": false
+      },
+      {
+        "name": "toggleMinimize",
+        "kind": "function",
+        "file": "content.js",
+        "line": 219,
+        "exported": false
+      },
+      {
+        "name": "updateNextButtonText",
+        "kind": "function",
+        "file": "content.js",
+        "line": 268,
+        "exported": false
+      },
+      {
+        "name": "updateStatus",
+        "kind": "function",
+        "file": "content.js",
+        "line": 263,
+        "exported": false
+      },
+      {
+        "name": "updateStatusDisplay",
+        "kind": "function",
+        "file": "content.js",
+        "line": 352,
+        "exported": false
+      }
+    ],
+    "types": [],
+    "enums": []
+  },
+  "publicAPI": [],
+  "dependencies": {
+    "mostImported": []
+  },
+  "stats": {
+    "totalSymbols": 18,
+    "exportedSymbols": 0,
+    "analysisTimeMs": 143
+  }
+}

@@ -1,4 +1,4 @@
-﻿/* Container Principal */
+/* Container Principal */
 #ai-queue-panel {
   position: fixed;
   top: 80px; /* Descendo para não tampar botões do GPT */
@@ -251,3 +251,209 @@ button svg {
   color: #00a2ff;
 }
 
+/* --- NEW: Tabs and Agent Mode --- */
+.queue-tabs {
+  display: flex;
+  border-bottom: 1px solid #333;
+  margin-bottom: 10px;
+}
+
+.queue-tab {
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.queue-tab.active {
+  color: #00a2ff;
+  border-bottom: 2px solid #00a2ff;
+}
+
+.queue-tab:hover {
+  color: #fff;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.agent-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.agent-input {
+  width: 100%;
+  padding: 10px;
+  background: #2a2b32;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  font-size: 12px;
+}
+
+.agent-btn {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  font-size: 12px;
+}
+
+.agent-btn:hover {
+  filter: brightness(1.1);
+}
+
+.agent-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.plan-preview {
+  margin-top: 15px;
+  border-top: 1px solid #333;
+  padding-top: 10px;
+}
+
+.plan-item {
+  background: rgba(255,255,255,0.05);
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  font-size: 10px;
+  border-left: 2px solid #9b59b6;
+}
+
+.plan-item h4 {
+  margin: 0 0 2px 0;
+  color: #ccc;
+  font-weight: 600;
+}
+
+.plan-item p {
+
+  margin: 0;
+
+  color: #888;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+}
+
+
+
+.analysis-box .plan-item p {
+
+
+
+  white-space: normal;
+
+
+
+  overflow: visible;
+
+
+
+  text-overflow: clip;
+
+
+
+  color: #c9d1d9;
+
+
+
+  font-size: 11px;
+
+
+
+  margin-top: 4px;
+
+
+
+}
+
+
+
+
+
+
+
+.analysis-box {
+
+
+
+  background: #161b22;
+
+
+
+
+
+  border: 1px solid #30363d;
+
+  border-radius: 8px;
+
+  padding: 12px;
+
+  margin-top: 15px;
+
+  font-size: 11px;
+
+  color: #c9d1d9;
+
+  line-height: 1.4;
+
+  max-height: 300px;
+
+  overflow-y: auto;
+
+}
+
+
+
+.analysis-box h3 {
+
+  color: #58a6ff;
+
+  margin-top: 0;
+
+}
+
+
+
+.analysis-box code {
+
+  background: rgba(110,118,129,0.4);
+
+  padding: 2px 4px;
+
+  border-radius: 4px;
+
+}
